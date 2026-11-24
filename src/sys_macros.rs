@@ -63,6 +63,10 @@ macro_rules! static_assert_sys_struct {
                         ::core::mem::size_of::<$name>()
                             == ::core::mem::size_of::<sys::$name>()
                     );
+                    $crate::__static_assert!(
+                        ::core::mem::align_of::<$name>()
+                            == ::core::mem::align_of::<sys::$name>()
+                    );
                     let s: $name = unsafe { ::core::mem::zeroed() };
                     // field names and types
                     let _ = sys::$name {$(
