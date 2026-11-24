@@ -204,53 +204,37 @@ macro_rules! __static_assert_sys_fn_cmp {
     };
 }
 
+#[cfg(any(target_os = "aix", target_os = "hermit", target_os = "nto", target_os = "qnx"))]
 #[macro_export]
 macro_rules! __static_assert_sys_import {
     () => {
-        $crate::__cfg_sel!({
-            #[cfg(any(
-                target_os = "aix",
-                target_os = "hermit",
-                target_os = "nto",
-                target_os = "qnx",
-            ))]
-            {
-                use ::libc as sys;
-            }
-            #[cfg(target_os = "redox")]
-            {
-                use ::syscall as sys;
-            }
-            #[cfg(windows)]
-            {}
-            #[cfg(else)]
-            {
-                use $crate::sys;
-            }
-        });
+        use ::libc as sys;
     };
 }
-
-// rustfmt-compatible cfg_select/cfg_if alternative
-// Note: This macro is __cfg_sel!({ }), not __cfg_sel! { }.
-// An extra brace is used in input to make contents rustfmt-able.
+#[cfg(target_os = "redox")]
 #[macro_export]
-#[doc(hidden)]
-macro_rules! __cfg_sel {
-    ({#[cfg(else)] { $($output:tt)* }}) => {
-        $($output)*
+macro_rules! __static_assert_sys_import {
+    () => {
+        use ::syscall as sys;
     };
-    ({
-        #[cfg($cfg:meta)]
-        { $($output:tt)* }
-        $($( $rest:tt )+)?
-    }) => {
-        #[cfg($cfg)]
-        $crate::__cfg_sel! {{#[cfg(else)] { $($output)* }}}
-        $(
-            #[cfg(not($cfg))]
-            $crate::__cfg_sel! {{ $($rest)+ }}
-        )?
+}
+#[cfg(windows)]
+#[macro_export]
+macro_rules! __static_assert_sys_import {
+    () => {};
+}
+#[cfg(not(any(
+    target_os = "aix",
+    target_os = "hermit",
+    target_os = "nto",
+    target_os = "qnx",
+    target_os = "redox",
+    windows,
+)))]
+#[macro_export]
+macro_rules! __static_assert_sys_import {
+    () => {
+        use $crate::sys;
     };
 }
 

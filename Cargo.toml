@@ -49,8 +49,8 @@ non_ascii_idents = "warn"
 rust_2018_idioms = "warn"
 single_use_lifetimes = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = [
-    'cfg(target_arch,values("loongarch32"))', # 1.89+ https://github.com/rust-lang/rust/pull/142053
     'cfg(target_os,values("trusty"))', # 1.82+ https://github.com/rust-lang/rust/pull/129490
+    'cfg(target_os,values("qnx"))', # 1.98+ https://github.com/rust-lang/rust/pull/129490
 ] }
 unnameable_types = "warn"
 unreachable_pub = "warn"
