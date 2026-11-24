@@ -192,23 +192,83 @@ macro_rules! static_assert_sys_const {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __static_assert_sys_const_cmp {
-    (RTLD_DEFAULT, $ty:ty) => {
-        // ptr comparison and ptr-to-int cast are not stable on const context, so use ptr-to-int
-        // transmute and compare its result.
-        $crate::__static_assert!(
-            // SAFETY: Pointer-to-integer transmutes are valid (since we are okay with losing the
-            // provenance here). (Same as <pointer>::addr().)
-            unsafe {
-                ::core::mem::transmute::<$ty, usize>(RTLD_DEFAULT)
-                    == ::core::mem::transmute::<$ty, usize>(sys::RTLD_DEFAULT)
-            }
-        );
-    };
     ($name:ident, $ty:ty) => {
-        $crate::__static_assert!(
-            ($name == sys::$name as $ty) & ($name as i128 == sys::$name as i128)
-        );
+        $crate::__static_assert!({
+            let values = (
+                $crate::__const_cmp::Scalar::<$ty>($name).value(),
+                $crate::__const_cmp::Scalar(sys::$name).value(),
+            );
+            // Comparison code is inline because float comparison in const fn require Rust 1.82.
+            {
+                use ::core::primitive::{f64, u128, usize};
+                use $crate::__const_cmp::Value;
+                match values {
+                    (Value::Int(a_negative, a), Value::Int(b_negative, b)) => {
+                        a_negative == b_negative && a == b
+                    }
+                    (Value::Float(a), Value::Float(b)) => a == b,
+                    (Value::Int(negative, magnitude), Value::Float(float))
+                    | (Value::Float(float), Value::Int(negative, magnitude)) => {
+                        let abs = if negative { -float } else { float };
+                        // u128::MAX rounds up to 2^128 in f64. Exclude that boundary
+                        // before casting, and rule out rounding in both directions.
+                        abs >= 0.0
+                            && abs < u128::MAX as f64
+                            && abs as u128 == magnitude
+                            && magnitude as f64 == abs
+                    }
+                    (Value::Ptr(a), Value::Ptr(b)) => {
+                        // ptr comparison and ptr-to-int cast are not stable on const context.
+                        // SAFETY: Null and integer-derived FFI sentinels have no allocation
+                        // provenance. Const evaluation rejects allocation-backed addresses.
+                        unsafe {
+                            ::core::mem::transmute::<*const (), usize>(a)
+                                == ::core::mem::transmute::<*const (), usize>(b)
+                        }
+                    }
+                    _ => false,
+                }
+            }
+        });
     };
+}
+
+#[doc(hidden)]
+pub mod __const_cmp {
+    pub struct Scalar<T>(pub T);
+
+    #[must_use]
+    pub enum Value {
+        Int(/* sign */ bool, /* magnitude */ u128),
+        Float(f64),
+        Ptr(*const ()),
+    }
+
+    macro_rules! scalar {
+        ($($ty:ty),+ => |$v:ident| $cast:expr) => {$(
+            impl Scalar<$ty> {
+                #[allow(clippy::unnecessary_cast)]
+                pub const fn value(self) -> Value {
+                    let $v = self.0;
+                    $cast
+                }
+            }
+        )+};
+    }
+    scalar!(u8, u16, u32, u64, u128, usize, bool, char => |v| Value::Int(false, v as u128));
+    scalar!(i8, i16, i32, i64, i128, isize => |v| Value::Int(v < 0, v.unsigned_abs() as u128));
+    scalar!(f32, f64 => |v| Value::Float(v as f64));
+
+    impl<T> Scalar<*const T> {
+        pub const fn value(self) -> Value {
+            Value::Ptr(self.0.cast::<()>())
+        }
+    }
+    impl<T> Scalar<*mut T> {
+        pub const fn value(self) -> Value {
+            Value::Ptr(self.0.cast::<()>())
+        }
+    }
 }
 
 /// Static assertions for FFI bindings.
