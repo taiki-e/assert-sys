@@ -31,6 +31,7 @@ nostdinc
 octeon
 osfmk
 OSREV
+pointee
 prctl
 prettyplease
 quic
