@@ -147,7 +147,9 @@ macro_rules! __static_assert_sys_const_cmp {
         );
     };
     ($name:ident, $ty:ty) => {
-        $crate::__static_assert!($name == sys::$name as $ty);
+        $crate::__static_assert!(
+            ($name == sys::$name as $ty) & ($name as i128 == sys::$name as i128)
+        );
     };
 }
 
