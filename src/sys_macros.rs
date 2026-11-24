@@ -26,7 +26,10 @@ macro_rules! static_assert_sys_type {
                 $(#[$attr])*
                 {
                     $(use ::windows_sys::$($windows_path)::+ as sys;)?
-                    fn _check(a: $name) -> sys::$name {
+                    fn _check1(a: $name) -> sys::$name {
+                        a
+                    }
+                    fn _check2(a: sys::$name) -> $name {
                         a
                     }
                 }
@@ -67,11 +70,16 @@ macro_rules! static_assert_sys_struct {
                         ::core::mem::align_of::<$name>()
                             == ::core::mem::align_of::<sys::$name>()
                     );
-                    let s: $name = unsafe { ::core::mem::zeroed() };
+                    let s1: $name = unsafe { ::core::mem::zeroed() };
+                    let s2: sys::$name = unsafe { ::core::mem::zeroed() };
                     // field names and types
                     let _ = sys::$name {$(
                         $(#[$field_attr])*
-                        $field_name: s.$field_name,
+                        $field_name: s1.$field_name,
+                    )*};
+                    let _ = $name {$(
+                        $(#[$field_attr])*
+                        $field_name: s2.$field_name,
                     )*};
                     // field offsets
                     $(
