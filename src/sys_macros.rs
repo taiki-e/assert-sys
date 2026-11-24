@@ -248,16 +248,8 @@ macro_rules! __cfg_sel {
     };
 }
 
-// inline_const requires Rust 1.79 (use since(1.80) because it is unstable in early 1.79)
-#[rustversion::since(1.80)]
-#[macro_export]
-#[doc(hidden)]
-macro_rules! __static_assert {
-    ($cond:expr $(,)?) => {
-        const { assert!($cond) }
-    };
-}
-#[rustversion::before(1.80)]
+// Do not use inline_const-based __static_assert! because it is not always evaluated with `cargo check`
+// (`cargo build` and `cargo test` are fine).
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __static_assert {
