@@ -254,6 +254,6 @@ macro_rules! __cfg_sel {
 #[doc(hidden)]
 macro_rules! __static_assert {
     ($cond:expr $(,)?) => {{
-        let [()] = [(); (true /* type check */ & $cond) as usize];
+        const _: [(); 1] = [(); (true /* type check */ & $cond) as usize];
     }};
 }
