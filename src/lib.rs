@@ -101,7 +101,7 @@ macro_rules! static_assert_sys_struct {
             $field_name:ident: $field_ty:ty,
         )*}
     )*) => {
-        #[allow(unused_imports, clippy::undocumented_unsafe_blocks)]
+        #[allow(unused_imports)]
         const _: fn() = || {
             $crate::__static_assert_sys_import!();
             $(
@@ -116,22 +116,23 @@ macro_rules! static_assert_sys_struct {
                         ::core::mem::align_of::<$name>()
                             == ::core::mem::align_of::<sys::$name>()
                     );
-                    let s1: $name = unsafe { ::core::mem::zeroed() };
-                    let s2: sys::$name = unsafe { ::core::mem::zeroed() };
-                    // field names and types
-                    let _ = sys::$name {$(
-                        $(#[$field_attr])*
-                        $field_name: s1.$field_name,
-                    )*};
-                    let _ = $name {$(
-                        $(#[$field_attr])*
-                        $field_name: s2.$field_name,
-                    )*};
-                    // field offsets
-                    $(
-                        $(#[$field_attr])*
-                        $crate::__static_assert_sys_struct_offset_cmp!($name, $field_name);
-                    )*
+                    let _ = |local: &$name, reference: &sys::$name| {
+                        // Check missing or extra field.
+                        let $name { $($(#[$field_attr])* $field_name: _,)* } = local;
+                        let sys::$name { $($(#[$field_attr])* $field_name: _,)* } = reference;
+                        $(
+                            $(#[$field_attr])*
+                            {
+                                // The outer &mut makes the pointee type invariant, preventing implicit field coercions.
+                                let mut local_ptr = ::core::ptr::addr_of!(local.$field_name);
+                                let mut reference_ptr =
+                                    ::core::ptr::addr_of!(reference.$field_name);
+                                let _: [&mut *const $field_ty; 2] =
+                                    [&mut local_ptr, &mut reference_ptr];
+                                $crate::__static_assert_sys_struct_offset_cmp!($name, $field_name);
+                            }
+                        )*
+                    };
                 }
             )*
         };
