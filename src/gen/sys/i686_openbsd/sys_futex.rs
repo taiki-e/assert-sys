@@ -14,12 +14,21 @@ pub const FUTEX_PRIVATE_FLAG: u32 = 128;
 pub const FUTEX_WAIT_PRIVATE: u32 = 129;
 pub const FUTEX_WAKE_PRIVATE: u32 = 130;
 pub const FUTEX_REQUEUE_PRIVATE: u32 = 131;
+pub type __int64_t = super::ffi::c_longlong;
+pub type __time_t = __int64_t;
+pub type time_t = __time_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct timespec {
+    pub tv_sec: time_t,
+    pub tv_nsec: super::ffi::c_long,
+}
 extern "C" {
     pub fn futex(
         arg1: *mut u32,
         arg2: super::ffi::c_int,
         arg3: super::ffi::c_int,
-        arg4: *const [u8; 0usize],
+        arg4: *const timespec,
         arg5: *mut u32,
     ) -> super::ffi::c_int;
 }
