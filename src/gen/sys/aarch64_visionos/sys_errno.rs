@@ -85,4 +85,6 @@ pub const EPROTO: u32 = 100;
 pub const ETIME: u32 = 101;
 pub const EOPNOTSUPP: u32 = 102;
 pub const ENOPOLICY: u32 = 103;
+pub const ENOTRECOVERABLE: u32 = 104;
+pub const EOWNERDEAD: u32 = 105;
 pub const ENOTCAPABLE: u32 = 107;
