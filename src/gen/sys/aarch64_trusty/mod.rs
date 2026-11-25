@@ -6,9 +6,6 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 #[path = "../../../ffi.rs"]
 mod ffi;
-mod dlfcn;
-pub use self::dlfcn::RTLD_DEFAULT;
-pub use self::dlfcn::dlsym;
 mod sys_auxv;
 pub use self::sys_auxv::AT_NULL;
 pub use self::sys_auxv::AT_IGNORE;

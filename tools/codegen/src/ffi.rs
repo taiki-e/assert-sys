@@ -207,19 +207,6 @@ static TARGETS: &[Target] = &[
                 env: &[],
             },
             Header {
-                // https://gitlab.com/gnutools/glibc/-/blob/HEAD/dlfcn/dlfcn.h
-                // https://git.musl-libc.org/cgit/musl/tree/include/dlfcn.h
-                // https://github.com/wbx-github/uclibc-ng/blob/HEAD/include/dlfcn.h
-                // https://android.googlesource.com/platform/bionic.git/+/refs/heads/main/libc/include/dlfcn.h
-                path: "dlfcn.h",
-                types: &[],
-                vars: &["RTLD_DEFAULT"],
-                functions: &["dlsym"],
-                arch: &[],
-                os: &[],
-                env: &[],
-            },
-            Header {
                 // https://gitlab.com/gnutools/glibc/-/blob/HEAD/include/errno.h
                 // https://git.musl-libc.org/cgit/musl/tree/include/errno.h
                 // https://github.com/wbx-github/uclibc-ng/blob/HEAD/include/errno.h
@@ -300,17 +287,6 @@ static TARGETS: &[Target] = &[
         ],
         headers: &[
             Header {
-                // https://github.com/kernkonzept/l4re-core/blob/HEAD/libc/uclibc-ng/contrib/uclibc/include/dlfcn.h
-                // https://android.googlesource.com/trusty/external/musl/+/refs/heads/main/include/dlfcn.h
-                path: "dlfcn.h",
-                types: &[],
-                vars: &["RTLD_DEFAULT"],
-                functions: &["dlsym"],
-                arch: &[],
-                os: &[],
-                env: &[],
-            },
-            Header {
                 // https://github.com/kernkonzept/l4re-core/blob/HEAD/libc/uclibc-ng/contrib/uclibc/include/sys/auxv.h
                 // https://android.googlesource.com/trusty/external/musl/+/refs/heads/main/include/sys/auxv.h
                 path: "sys/auxv.h",
@@ -386,8 +362,8 @@ static TARGETS: &[Target] = &[
                 // https://github.com/apple-oss-distributions/xnu/blob/HEAD/bsd/sys/sysctl.h
                 path: "sys/sysctl.h",
                 types: &[],
-                vars: &["CTL_MAXNAME"],
-                functions: &["sysctl", "sysctlbyname"],
+                vars: &[],
+                functions: &["sysctlbyname"],
                 arch: &[],
                 os: &[],
                 env: &[],
@@ -417,16 +393,6 @@ static TARGETS: &[Target] = &[
             "x86_64-unknown-freebsd",
         ],
         headers: &[
-            Header {
-                // https://github.com/freebsd/freebsd-src/blob/HEAD/include/dlfcn.h
-                path: "dlfcn.h",
-                types: &[],
-                vars: &["RTLD_DEFAULT"],
-                functions: &["dlsym"],
-                arch: &[],
-                os: &[],
-                env: &[],
-            },
             Header {
                 // https://github.com/freebsd/freebsd-src/blob/HEAD/include/unistd.h
                 path: "unistd.h",
@@ -468,21 +434,11 @@ static TARGETS: &[Target] = &[
                 env: &[],
             },
             Header {
-                // https://github.com/freebsd/freebsd-src/blob/HEAD/sys/sys/syscall.h
-                path: "sys/syscall.h",
-                types: &[],
-                vars: &["SYS_.*"],
-                functions: &[],
-                arch: &[],
-                os: &[],
-                env: &[],
-            },
-            Header {
                 // https://github.com/freebsd/freebsd-src/blob/HEAD/sys/sys/sysctl.h
                 path: "sys/sysctl.h",
                 types: &[],
                 vars: &["CTL_KERN", "KERN_PROC", "KERN_PROC_AUXV"],
-                functions: &["sysctl", "sysctlbyname"],
+                functions: &["sysctl"],
                 arch: &[],
                 os: &[],
                 env: &[],
@@ -568,7 +524,7 @@ static TARGETS: &[Target] = &[
             Header {
                 // https://github.com/NetBSD/src/blob/HEAD/sys/sys/futex.h
                 path: "sys/futex.h",
-                types: &["futex.*"],
+                types: &[],
                 // TODO: FUTEX_PRIVATE_FLAG
                 vars: &["FUTEX.*"],
                 functions: &[],
@@ -649,16 +605,6 @@ static TARGETS: &[Target] = &[
                 types: &[],
                 vars: &["E.*"],
                 functions: &["__errno"],
-                arch: &[],
-                os: &[],
-                env: &[],
-            },
-            Header {
-                // https://github.com/openbsd/src/blob/HEAD/include/dlfcn.h
-                path: "dlfcn.h",
-                types: &[],
-                vars: &["RTLD_DEFAULT"],
-                functions: &["dlsym"],
                 arch: &[],
                 os: &[],
                 env: &[],
@@ -1060,7 +1006,6 @@ pub(crate) fn generate() {
                         let headers_dir = src_dir.join("usr/include");
                         header_path = headers_dir.join(header.path);
                         include = vec![headers_dir.join("l4-arch"), headers_dir];
-                        // define!(_GNU_SOURCE); // RTLD_DEFAULT needs this
                     }
                     trusty => {
                         let headers_dir = src_dir
