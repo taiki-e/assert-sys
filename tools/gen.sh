@@ -53,6 +53,7 @@ if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
   docker cp -- "gcc-csky-linux-gnuabiv2:/csky-unknown-linux-gnuabiv2" "${HOME}"/gcc-csky-linux-gnuabiv2
   docker rm -f -- gcc-csky-linux-gnuabiv2 >/dev/null
   printf '%s\n' "${HOME}"/gcc-csky-linux-gnuabiv2/bin >>"${GITHUB_PATH}"
+  retry rustup component add rustfmt # used by windows-bindgen
 fi
 
 cargo run --manifest-path tools/codegen/Cargo.toml

@@ -1284,6 +1284,50 @@ pub(crate) fn generate() {
             );
         }
     }
+    {
+        let out = &out_dir.join("windows.rs");
+        // Windows
+        windows_bindgen::bindgen([
+            "--sys",
+            "--sys-fn-extern",
+            "--flat",
+            "--no-allow",
+            "--no-comment",
+            "--no-deps",
+            "--out",
+            out.as_str(),
+            "--filter",
+            "Windows.Win32.Foundation.FALSE",
+            "Windows.Win32.Foundation.FARPROC",
+            "Windows.Win32.Foundation.HMODULE",
+            "Windows.Win32.System.LibraryLoader.GetModuleHandleA",
+            "Windows.Win32.System.LibraryLoader.GetProcAddress",
+            "Windows.Win32.System.Threading.INFINITE",
+            "Windows.Win32.System.Threading.IsProcessorFeaturePresent",
+            "Windows.Win32.System.Threading.PF_ARM_*",
+            "Windows.Win32.System.Threading.PROCESSOR_FEATURE_ID",
+            "Windows.Win32.System.Threading.WaitOnAddress",
+            "Windows.Win32.System.Threading.WakeByAddressAll",
+            "Windows.Win32.System.Threading.WakeByAddressSingle",
+        ])
+        .unwrap();
+        let bindings = fs_err::read_to_string(out).unwrap();
+        // unsafe extern requires edition 2024.
+        let bindings = bindings.replace("unsafe extern \"system\" {", "extern \"system\" {");
+        file::write(
+            function_name!(),
+            bin_name!(),
+            workspace_root.as_std_path(),
+            out,
+            bindings.parse().unwrap(),
+        );
+        target_modules.push(quote! {
+            #[cfg(windows)]
+            mod windows;
+            #[cfg(windows)]
+            pub use self::windows::*;
+        });
+    }
     file::write(
         function_name!(),
         bin_name!(),
@@ -1293,6 +1337,7 @@ pub(crate) fn generate() {
             #![allow(
                 dead_code,
                 non_camel_case_types,
+                non_snake_case,
                 non_upper_case_globals,
                 unreachable_pub,
                 unknown_lints,

@@ -7,6 +7,7 @@
 #![allow(
     dead_code,
     non_camel_case_types,
+    non_snake_case,
     non_upper_case_globals,
     unreachable_pub,
     unknown_lints,
@@ -1981,3 +1982,7 @@ mod x86_64_fuchsia;
     )
 )]
 pub use self::x86_64_fuchsia::*;
+#[cfg(windows)]
+mod windows;
+#[cfg(windows)]
+pub use self::windows::*;

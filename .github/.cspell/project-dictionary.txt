@@ -11,6 +11,7 @@ DESTDIR
 dlfcn
 dlsym
 evbmips
+FARPROC
 fcntl
 funsigned
 futex
