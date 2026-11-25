@@ -1089,7 +1089,12 @@ pub(crate) fn generate() {
                             src_dir.parent().unwrap().join("libpthread/include"),
                         ];
                         // https://github.com/apple-oss-distributions/xnu/blob/xnu-12377.121.6/bsd/sys/cdefs.h#L654
-                        define!(_POSIX_C_SOURCE, "200112L");
+                        if header.path == "sys/errno.h" {
+                            // EOWNERDEAD and ENOTRECOVERABLE require POSIX.1-2008.
+                            define!(_POSIX_C_SOURCE, "200809L");
+                        } else {
+                            define!(_POSIX_C_SOURCE, "200112L");
+                        }
                         include_header!("sys/_types/_u_char.h");
                         include_header!("sys/_types/_u_short.h");
                         include_header!("sys/_types/_u_int.h");
