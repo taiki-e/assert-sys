@@ -12,6 +12,7 @@ dlfcn
 dlsym
 evbmips
 fcntl
+funsigned
 futex
 getauxval
 getisax
