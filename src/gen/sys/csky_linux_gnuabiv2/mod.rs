@@ -818,4 +818,4 @@ mod sys_auxv;
 pub use self::sys_auxv::getauxval;
 mod unistd;
 pub use self::unistd::syscall;
-pub type c_char = i8;
+pub type c_char = u8;
