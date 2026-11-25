@@ -18,12 +18,3 @@ extern "C" {
         arg6: usize,
     ) -> super::ffi::c_int;
 }
-extern "C" {
-    pub fn sysctlbyname(
-        arg1: *const super::ffi::c_char,
-        arg2: *mut super::ffi::c_void,
-        arg3: *mut usize,
-        arg4: *const super::ffi::c_void,
-        arg5: usize,
-    ) -> super::ffi::c_int;
-}

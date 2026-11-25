@@ -8,8 +8,6 @@ cputable
 CTLFLAG
 CTLTYPE
 DESTDIR
-dlfcn
-dlsym
 evbmips
 FARPROC
 fcntl
@@ -39,7 +37,6 @@ prettyplease
 quic
 richlowe
 rseq
-RTLD
 solarish
 stdbool
 stddef

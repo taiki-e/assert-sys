@@ -5,18 +5,7 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub const CTL_MAXNAME: u32 = 12;
 pub type u_int = super::ffi::c_uint;
-extern "C" {
-    pub fn sysctl(
-        arg1: *mut super::ffi::c_int,
-        arg2: u_int,
-        arg3: *mut super::ffi::c_void,
-        oldlenp: *mut usize,
-        arg4: *mut super::ffi::c_void,
-        newlen: usize,
-    ) -> super::ffi::c_int;
-}
 extern "C" {
     pub fn sysctlbyname(
         arg1: *const super::ffi::c_char,

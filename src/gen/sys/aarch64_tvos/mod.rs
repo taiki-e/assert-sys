@@ -91,8 +91,6 @@ pub use self::sys_errno::ENOTRECOVERABLE;
 pub use self::sys_errno::EOWNERDEAD;
 pub use self::sys_errno::ENOTCAPABLE;
 mod sys_sysctl;
-pub use self::sys_sysctl::CTL_MAXNAME;
-pub use self::sys_sysctl::sysctl;
 pub use self::sys_sysctl::sysctlbyname;
 mod arm_cpu_capabilities_public;
 pub use self::arm_cpu_capabilities_public::CAP_BIT_FEAT_FlagM;
