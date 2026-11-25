@@ -1029,6 +1029,11 @@ pub(crate) fn generate() {
                         clang_args.push(concat!("-D", stringify!($name), "=", $value));
                     }};
                 }
+                macro_rules! undefine {
+                    ($name:ident) => {{
+                        clang_args.push(concat!("-U", stringify!($name)));
+                    }};
+                }
                 macro_rules! include_header {
                     ($value:literal) => {{
                         clang_args.push(concat!("-include", $value));
@@ -1042,6 +1047,13 @@ pub(crate) fn generate() {
                         if let Some(path) = header.path.strip_prefix("linux-headers:") {
                             header_path = linux_headers_dir.join(path);
                             include = vec![linux_headers_dir];
+                            if target.arch == aarch64 && target.target_pointer_width == 32 {
+                                // Clang incorrectly treats aarch64{,_be}-linux-gnu_ilp32 as LP64.
+                                undefine!(_LP64);
+                                undefine!(__LP64__);
+                                define!(_ILP32);
+                                define!(__ILP32__);
+                            }
                         } else if target.os == android {
                             let bionic_dir = bionic_dir(src_dir).join("libc");
                             header_path = bionic_dir.join("include").join(header.path);
