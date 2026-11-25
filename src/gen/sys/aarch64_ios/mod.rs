@@ -85,6 +85,8 @@ pub use self::sys_errno::EPROTO;
 pub use self::sys_errno::ETIME;
 pub use self::sys_errno::EOPNOTSUPP;
 pub use self::sys_errno::ENOPOLICY;
+pub use self::sys_errno::ENOTRECOVERABLE;
+pub use self::sys_errno::EOWNERDEAD;
 pub use self::sys_errno::ENOTCAPABLE;
 mod sys_sysctl;
 pub use self::sys_sysctl::CTL_MAXNAME;
