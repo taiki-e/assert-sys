@@ -5,7 +5,6 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub type u_int = super::ffi::c_uint;
 extern "C" {
     pub fn sysctlbyname(
         arg1: *const super::ffi::c_char,
