@@ -8,6 +8,9 @@ updates:
       default-days: 14 # Note: Unless dependencies are pinned/locked, the effect is limited.
     commit-message:
       prefix: ''
+    ignore:
+      # windows-bindgen 0.100 has a lot of breaking changes.
+      - dependency-name: windows-bindgen
     labels: []
   - package-ecosystem: github-actions
     directory: /

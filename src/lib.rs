@@ -80,7 +80,7 @@ pub mod sys;
 macro_rules! static_assert_sys_type {
     ($(
         $(#[$attr:meta])*
-        type $([$($windows_path:ident)::+])? $name:ident;
+        type $name:ident;
     )*) => {
         #[allow(
             unused_imports,
@@ -93,7 +93,6 @@ macro_rules! static_assert_sys_type {
             $(
                 $(#[$attr])*
                 {
-                    $(use ::windows_sys::$($windows_path)::+ as sys;)?
                     fn _check1(a: $name) -> sys::$name {
                         a
                     }
@@ -118,7 +117,7 @@ macro_rules! static_assert_sys_type {
 macro_rules! static_assert_sys_struct {
     ($(
         $(#[$attr:meta])*
-        struct $([$($windows_path:ident)::+])? $name:ident {$(
+        struct $name:ident {$(
             $(#[$field_attr:meta])*
             $field_name:ident: $field_ty:ty,
         )*}
@@ -129,7 +128,6 @@ macro_rules! static_assert_sys_struct {
             $(
                 $(#[$attr])*
                 {
-                    $(use ::windows_sys::$($windows_path)::+ as sys;)?
                     $crate::__static_assert!(
                         ::core::mem::size_of::<$name>()
                             == ::core::mem::size_of::<sys::$name>()
@@ -191,7 +189,7 @@ macro_rules! __static_assert_sys_struct_offset_cmp {
 macro_rules! static_assert_sys_const {
     ($(
         $(#[$attr:meta])*
-        const $([$($windows_path:ident)::+])? $name:ident: $ty:ty;
+        const $name:ident: $ty:ty;
     )*) => {
         #[allow(
             unused_attributes, // for #[allow(..)] in $(#[$attr])*
@@ -205,7 +203,6 @@ macro_rules! static_assert_sys_const {
             $(
                 $(#[$attr])*
                 {
-                    $(use ::windows_sys::$($windows_path)::+ as sys;)?
                     $crate::__static_assert_sys_const_cmp!($name, $ty);
                 }
             )*
@@ -307,7 +304,7 @@ macro_rules! static_assert_sys_fn {
         $(#[$extern_attr:meta])*
         extern $abi:literal {$(
             $(#[$fn_attr:meta])*
-            fn $([$($windows_path:ident)::+])? $name:ident($($args:tt)*) $(-> $ret_ty:ty)?;
+            fn $name:ident($($args:tt)*) $(-> $ret_ty:ty)?;
         )*}
     ) => {
         #[allow(unused_imports)]
@@ -316,7 +313,6 @@ macro_rules! static_assert_sys_fn {
             $(
                 $(#[$fn_attr])*
                 {
-                    $(use ::windows_sys::$($windows_path)::+ as sys;)?
                     $crate::__static_assert_sys_fn_cmp!($abi fn $name($($args)*) $(-> $ret_ty)?);
                 }
             )*
@@ -354,18 +350,12 @@ macro_rules! __static_assert_sys_import {
         use ::syscall as sys;
     };
 }
-#[cfg(windows)]
-#[macro_export]
-macro_rules! __static_assert_sys_import {
-    () => {};
-}
 #[cfg(not(any(
     target_os = "aix",
     target_os = "hermit",
     target_os = "nto",
     target_os = "qnx",
     target_os = "redox",
-    windows,
 )))]
 #[macro_export]
 macro_rules! __static_assert_sys_import {
