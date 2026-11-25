@@ -6,5 +6,5 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 extern "C" {
-    pub fn __errno_location() -> *mut ::core::ffi::c_int;
+    pub fn __errno_location() -> *mut super::ffi::c_int;
 }

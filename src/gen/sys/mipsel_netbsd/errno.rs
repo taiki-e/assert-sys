@@ -106,5 +106,5 @@ pub const EOWNERDEAD: u32 = 97;
 pub const ENOTRECOVERABLE: u32 = 98;
 pub const ELAST: u32 = 98;
 extern "C" {
-    pub fn __errno() -> *mut ::std::os::raw::c_int;
+    pub fn __errno() -> *mut super::ffi::c_int;
 }

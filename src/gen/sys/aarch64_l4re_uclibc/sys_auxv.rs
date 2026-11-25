@@ -121,5 +121,5 @@ pub const HWCAP2_SME_BI32I32: u64 = 1099511627776;
 pub const HWCAP2_SME_B16B16: u64 = 2199023255552;
 pub const HWCAP2_SME_F16F16: u64 = 4398046511104;
 extern "C" {
-    pub fn getauxval(__type: ::core::ffi::c_ulong) -> ::core::ffi::c_ulong;
+    pub fn getauxval(__type: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

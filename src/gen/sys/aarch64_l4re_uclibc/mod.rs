@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod dlfcn;
 pub use self::dlfcn::dlsym;
 mod sys_auxv;

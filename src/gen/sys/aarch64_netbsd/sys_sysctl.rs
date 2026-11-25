@@ -80,34 +80,34 @@ pub const CTL_DEBUG_VALUE: u32 = 1;
 pub const CTL_PROC_PAXFLAGS_ASLR: u32 = 1;
 pub const CTL_PROC_PAXFLAGS_MPROTECT: u32 = 2;
 pub const CTL_PROC_PAXFLAGS_GUARD: u32 = 4;
-pub type u_int = ::std::os::raw::c_uint;
+pub type u_int = super::ffi::c_uint;
 pub type u_quad_t = u64;
-pub type sysctlfn = *mut ::core::ffi::c_void;
+pub type sysctlfn = *mut super::ffi::c_void;
 extern "C" {
     pub fn sysctl(
-        arg1: *const ::std::os::raw::c_int,
+        arg1: *const super::ffi::c_int,
         arg2: u_int,
-        arg3: *mut ::core::ffi::c_void,
+        arg3: *mut super::ffi::c_void,
         arg4: *mut usize,
-        arg5: *const ::core::ffi::c_void,
+        arg5: *const super::ffi::c_void,
         arg6: usize,
-    ) -> ::std::os::raw::c_int;
+    ) -> super::ffi::c_int;
 }
 extern "C" {
     pub fn sysctlbyname(
-        arg1: *const ::std::os::raw::c_char,
-        arg2: *mut ::core::ffi::c_void,
+        arg1: *const super::ffi::c_char,
+        arg2: *mut super::ffi::c_void,
         arg3: *mut usize,
-        arg4: *const ::core::ffi::c_void,
+        arg4: *const super::ffi::c_void,
         arg5: usize,
-    ) -> ::std::os::raw::c_int;
+    ) -> super::ffi::c_int;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sysctlnode {
     pub sysctl_flags: u32,
     pub sysctl_num: i32,
-    pub sysctl_name: [::std::os::raw::c_char; 32usize],
+    pub sysctl_name: [super::ffi::c_char; 32usize],
     pub sysctl_ver: u32,
     pub __rsvd: u32,
     pub sysctl_un: sysctlnode__bindgen_ty_1,
@@ -159,7 +159,7 @@ pub union sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1__bindgen_ty_1 {
-    pub __sysc_sdatum: *mut ::core::ffi::c_void,
+    pub __sysc_sdatum: *mut super::ffi::c_void,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -214,5 +214,5 @@ pub union sysctlnode__bindgen_ty_5 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct sysctlnode__bindgen_ty_5__bindgen_ty_1 {
-    pub __sysc_sdatum: *const ::std::os::raw::c_char,
+    pub __sysc_sdatum: *const super::ffi::c_char,
 }

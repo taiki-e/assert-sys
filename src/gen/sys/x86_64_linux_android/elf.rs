@@ -5,8 +5,8 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub type __u32 = ::std::os::raw::c_uint;
-pub type __u64 = ::std::os::raw::c_ulonglong;
+pub type __u32 = super::ffi::c_uint;
+pub type __u64 = super::ffi::c_ulonglong;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct Elf32_auxv_t {

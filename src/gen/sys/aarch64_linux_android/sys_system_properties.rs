@@ -8,7 +8,7 @@
 pub const PROP_VALUE_MAX: u32 = 92;
 extern "C" {
     pub fn __system_property_get(
-        __name: *const ::std::os::raw::c_char,
-        __value: *mut ::std::os::raw::c_char,
-    ) -> ::std::os::raw::c_int;
+        __name: *const super::ffi::c_char,
+        __value: *mut super::ffi::c_char,
+    ) -> super::ffi::c_int;
 }

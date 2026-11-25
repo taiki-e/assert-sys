@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod gnumach_kern_gsync;
 pub use self::gnumach_kern_gsync::GSYNC_SHARED;
 pub use self::gnumach_kern_gsync::GSYNC_QUAD;

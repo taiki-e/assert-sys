@@ -5,7 +5,7 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub type mach_port_name_t = ::core::ffi::c_uint;
+pub type mach_port_name_t = super::ffi::c_uint;
 pub type mach_port_t = mach_port_name_t;
 extern "C" {
     pub static mut __mach_task_self_: mach_port_t;

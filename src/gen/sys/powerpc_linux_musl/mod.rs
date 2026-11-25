@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod linux_headers_asm_cputable;
 pub use self::linux_headers_asm_cputable::PPC_FEATURE_32;
 pub use self::linux_headers_asm_cputable::PPC_FEATURE_64;

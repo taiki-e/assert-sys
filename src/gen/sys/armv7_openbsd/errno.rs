@@ -103,5 +103,5 @@ pub const EOWNERDEAD: u32 = 94;
 pub const EPROTO: u32 = 95;
 pub const ELAST: u32 = 95;
 extern "C" {
-    pub fn __errno() -> *mut ::core::ffi::c_int;
+    pub fn __errno() -> *mut super::ffi::c_int;
 }
