@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod sys_errno;
 pub use self::sys_errno::EPERM;
 pub use self::sys_errno::ENOENT;

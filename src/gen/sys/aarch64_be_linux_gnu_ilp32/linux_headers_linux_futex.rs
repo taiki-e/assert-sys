@@ -58,6 +58,6 @@ pub struct robust_list {
 #[derive(Copy, Clone)]
 pub struct robust_list_head {
     pub list: robust_list,
-    pub futex_offset: ::std::os::raw::c_long,
+    pub futex_offset: super::ffi::c_long,
     pub list_op_pending: *mut robust_list,
 }

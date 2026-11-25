@@ -50,5 +50,7 @@ sysctlnode
 timeval
 uapi
 uclibcabiv
+ulonglong
 umtx
 unistd
+upstreamed

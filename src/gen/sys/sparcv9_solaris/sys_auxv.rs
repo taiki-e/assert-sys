@@ -150,18 +150,18 @@ pub const AV2_SPARC_MME: u32 = 1048576;
 pub const AV_SPARC_HWMUL_32x32: u32 = 1;
 pub const AV_SPARC_HWDIV_32x32: u32 = 2;
 pub const AV_SPARC_HWFSMULD: u32 = 4;
-pub type uint_t = ::std::os::raw::c_uint;
+pub type uint_t = super::ffi::c_uint;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct auxv_t {
-    pub a_type: ::std::os::raw::c_int,
+    pub a_type: super::ffi::c_int,
     pub a_un: auxv_t__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union auxv_t__bindgen_ty_1 {
-    pub a_val: ::std::os::raw::c_long,
-    pub a_ptr: *mut ::core::ffi::c_void,
+    pub a_val: super::ffi::c_long,
+    pub a_ptr: *mut super::ffi::c_void,
     pub a_fcn: ::core::option::Option<unsafe extern "C" fn()>,
 }
 extern "C" {

@@ -17,9 +17,9 @@ pub const FUTEX_REQUEUE_PRIVATE: u32 = 131;
 extern "C" {
     pub fn futex(
         arg1: *mut u32,
-        arg2: ::std::os::raw::c_int,
-        arg3: ::std::os::raw::c_int,
+        arg2: super::ffi::c_int,
+        arg3: super::ffi::c_int,
         arg4: *const [u8; 0usize],
         arg5: *mut u32,
-    ) -> ::std::os::raw::c_int;
+    ) -> super::ffi::c_int;
 }

@@ -6,5 +6,5 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 extern "C" {
-    pub fn syscall(arg1: ::core::ffi::c_long, ...) -> ::core::ffi::c_long;
+    pub fn syscall(arg1: super::ffi::c_long, ...) -> super::ffi::c_long;
 }

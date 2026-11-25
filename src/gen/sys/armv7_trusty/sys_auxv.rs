@@ -100,5 +100,5 @@ pub const HWCAP_ARM_IDIV: u32 = 393216;
 pub const HWCAP_ARM_LPAE: u32 = 1048576;
 pub const HWCAP_ARM_EVTSTRM: u32 = 2097152;
 extern "C" {
-    pub fn getauxval(arg1: ::core::ffi::c_ulong) -> ::core::ffi::c_ulong;
+    pub fn getauxval(arg1: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

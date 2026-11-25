@@ -26,8 +26,8 @@ pub const O_CLOEXEC: u32 = 8388608;
 pub const O_ACCMODE: u32 = 6291459;
 extern "C" {
     pub fn open(
-        arg1: *const ::core::ffi::c_char,
-        arg2: ::core::ffi::c_int,
+        arg1: *const super::ffi::c_char,
+        arg2: super::ffi::c_int,
         ...
-    ) -> ::core::ffi::c_int;
+    ) -> super::ffi::c_int;
 }

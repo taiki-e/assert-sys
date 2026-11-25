@@ -21,5 +21,5 @@ pub const HWCAP_S390_VXRS_BCD: u32 = 4096;
 pub const HWCAP_S390_VXRS_EXT: u32 = 8192;
 pub const HWCAP_S390_GS: u32 = 16384;
 extern "C" {
-    pub fn getauxval(arg1: ::std::os::raw::c_ulong) -> ::std::os::raw::c_ulong;
+    pub fn getauxval(arg1: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

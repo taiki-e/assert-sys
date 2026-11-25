@@ -40,8 +40,30 @@ supposed to only be used in projects managed by us.
     // clippy::missing_inline_in_public_items,
 )]
 
-#[cfg(feature = "std")]
+#[cfg(test)]
 extern crate std;
+
+// rustfmt-compatible cfg_select/cfg_if alternative
+// Note: This macro is cfg_sel!({ }), not cfg_sel! { }.
+// An extra brace is used in input to make contents rustfmt-able.
+#[allow(unused_macros)]
+macro_rules! cfg_sel {
+    ({#[cfg(else)] { $($output:tt)* }}) => {
+        $($output)*
+    };
+    ({
+        #[cfg($cfg:meta)]
+        { $($output:tt)* }
+        $($( $rest:tt )+)?
+    }) => {
+        #[cfg($cfg)]
+        cfg_sel! {{#[cfg(else)] { $($output)* }}}
+        $(
+            #[cfg(not($cfg))]
+            cfg_sel! {{ $($rest)+ }}
+        )?
+    };
+}
 
 #[path = "gen/sys/mod.rs"]
 pub mod sys;

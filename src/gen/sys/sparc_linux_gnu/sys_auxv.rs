@@ -34,5 +34,5 @@ pub const HWCAP_SPARC_CBCOND: u32 = 33554432;
 pub const HWCAP_SPARC_CRYPTO: u32 = 67108864;
 pub const HWCAP_SPARC_ADP: u32 = 134217728;
 extern "C" {
-    pub fn getauxval(__type: ::std::os::raw::c_ulong) -> ::std::os::raw::c_ulong;
+    pub fn getauxval(__type: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

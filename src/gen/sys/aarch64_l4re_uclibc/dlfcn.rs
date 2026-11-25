@@ -7,7 +7,7 @@
 
 extern "C" {
     pub fn dlsym(
-        __handle: *mut ::core::ffi::c_void,
-        __name: *const ::core::ffi::c_char,
-    ) -> *mut ::core::ffi::c_void;
+        __handle: *mut super::ffi::c_void,
+        __name: *const super::ffi::c_char,
+    ) -> *mut super::ffi::c_void;
 }

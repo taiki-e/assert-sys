@@ -105,5 +105,5 @@ pub const EOWNERDEAD: u32 = 95;
 pub const EASYNC: u32 = 99;
 pub const ELAST: u32 = 99;
 extern "C" {
-    pub fn __errno_location() -> *mut ::std::os::raw::c_int;
+    pub fn __errno_location() -> *mut super::ffi::c_int;
 }

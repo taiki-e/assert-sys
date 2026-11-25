@@ -38,5 +38,3 @@ jobs:
       security-events: write # for github/codeql-action/*
     with:
       test-args: --exclude assert-sys-internal-codegen
-      no-std: false
-      build-args: --exclude-no-default-features

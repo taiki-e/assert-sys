@@ -6,14 +6,14 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 pub const CTL_MACHDEP: u32 = 7;
-pub type u_int = ::std::os::raw::c_uint;
+pub type u_int = super::ffi::c_uint;
 extern "C" {
     pub fn sysctl(
-        arg1: *const ::std::os::raw::c_int,
+        arg1: *const super::ffi::c_int,
         arg2: u_int,
-        arg3: *mut ::core::ffi::c_void,
+        arg3: *mut super::ffi::c_void,
         arg4: *mut usize,
-        arg5: *mut ::core::ffi::c_void,
+        arg5: *mut super::ffi::c_void,
         arg6: usize,
-    ) -> ::std::os::raw::c_int;
+    ) -> super::ffi::c_int;
 }

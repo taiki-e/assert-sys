@@ -111,8 +111,8 @@ pub const RISCV_HWPROBE_EXT_ZA64RS: u32 = 32;
 pub const RISCV_HWPROBE_EXT_B: u32 = 64;
 pub const RISCV_HWPROBE_EXT_ZIC64B: u32 = 128;
 pub const RISCV_HWPROBE_WHICH_CPUS: u32 = 1;
-pub type __s64 = ::std::os::raw::c_longlong;
-pub type __u64 = ::std::os::raw::c_ulonglong;
+pub type __s64 = super::ffi::c_longlong;
+pub type __u64 = super::ffi::c_ulonglong;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct riscv_hwprobe {

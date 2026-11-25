@@ -6,7 +6,7 @@ rust-version = "1.56"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/taiki-e/assert-sys"
 keywords = []
-categories = ["development-tools::testing"]
+categories = ["development-tools::testing", "external-ffi-bindings", "no-std", "no-std::no-alloc", "os"]
 exclude = ["/.*", "/tools", "/target-specs"]
 description = """
 Internal test helper.
@@ -23,10 +23,6 @@ allowed_external_types = [
 
 [lib]
 doc-scrape-examples = false
-
-[features]
-default = ["std"]
-std = []
 
 [dependencies]
 rustversion = "1"

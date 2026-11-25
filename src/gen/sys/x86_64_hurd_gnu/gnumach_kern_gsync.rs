@@ -10,29 +10,29 @@ pub const GSYNC_QUAD: u32 = 2;
 pub const GSYNC_TIMED: u32 = 4;
 pub const GSYNC_BROADCAST: u32 = 8;
 pub const GSYNC_MUTATE: u32 = 16;
-pub type natural_t = ::core::ffi::c_uint;
+pub type natural_t = super::ffi::c_uint;
 pub type vm_offset_t = usize;
-pub type boolean_t = ::core::ffi::c_int;
-pub type mach_port_name_t = ::core::ffi::c_uint;
+pub type boolean_t = super::ffi::c_int;
+pub type mach_port_name_t = super::ffi::c_uint;
 pub type mach_port_t = mach_port_name_t;
 pub type task_t = mach_port_t;
-pub type kern_return_t = ::core::ffi::c_int;
+pub type kern_return_t = super::ffi::c_int;
 extern "C" {
     pub fn gsync_wait(
         task: task_t,
         addr: vm_offset_t,
-        lo: ::core::ffi::c_uint,
-        hi: ::core::ffi::c_uint,
+        lo: super::ffi::c_uint,
+        hi: super::ffi::c_uint,
         msec: natural_t,
-        flags: ::core::ffi::c_int,
+        flags: super::ffi::c_int,
     ) -> kern_return_t;
 }
 extern "C" {
     pub fn gsync_wake(
         task: task_t,
         addr: vm_offset_t,
-        val: ::core::ffi::c_uint,
-        flags: ::core::ffi::c_int,
+        val: super::ffi::c_uint,
+        flags: super::ffi::c_int,
     ) -> kern_return_t;
 }
 extern "C" {
@@ -41,6 +41,6 @@ extern "C" {
         src_addr: vm_offset_t,
         dst_addr: vm_offset_t,
         wake_one: boolean_t,
-        flags: ::core::ffi::c_int,
+        flags: super::ffi::c_int,
     ) -> kern_return_t;
 }

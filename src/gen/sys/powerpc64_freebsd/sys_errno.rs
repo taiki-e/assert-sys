@@ -106,5 +106,5 @@ pub const EOWNERDEAD: u32 = 96;
 pub const EINTEGRITY: u32 = 97;
 pub const ELAST: u32 = 97;
 extern "C" {
-    pub fn __error() -> *mut ::std::os::raw::c_int;
+    pub fn __error() -> *mut super::ffi::c_int;
 }
