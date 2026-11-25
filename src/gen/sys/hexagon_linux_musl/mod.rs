@@ -598,7 +598,6 @@ pub use self::linux_headers_linux_futex::FUTEX_OP_CMP_GE;
 pub use self::linux_headers_linux_futex::futex_waitv;
 pub use self::linux_headers_linux_futex::robust_list;
 pub use self::linux_headers_linux_futex::robust_list_head;
-pub use self::linux_headers_linux_futex::FUTEX_CMD_MASK;
 mod linux_headers_linux_prctl;
 pub use self::linux_headers_linux_prctl::PR_SET_PDEATHSIG;
 pub use self::linux_headers_linux_prctl::PR_GET_PDEATHSIG;
