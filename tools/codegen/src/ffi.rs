@@ -676,7 +676,7 @@ static TARGETS: &[Target] = &[
             Header {
                 // https://github.com/openbsd/src/blob/HEAD/sys/sys/futex.h
                 path: "sys/futex.h",
-                types: &[],
+                types: &["timespec"],
                 vars: &["FUTEX.*"],
                 functions: &["futex"],
                 arch: &[],
@@ -1105,6 +1105,10 @@ pub(crate) fn generate() {
                         header_path = src_dir.join("include").join(header.path);
                         include = vec![src_dir.join("include")];
                         include_header!("sys/types.h");
+                        if target.os == openbsd && header.path == "sys/futex.h" {
+                            // futex requires the definition of struct timespec first.
+                            include_header!("sys/time.h");
+                        }
                         if target.os == openbsd && matches!(target.arch, x86 | x86_64) {
                             define!(_SYS_SENSORS_H_); // TODO: error: field has incomplete type 'struct timeval'
                         }

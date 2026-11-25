@@ -126,6 +126,7 @@ pub use self::sys_futex::FUTEX_PRIVATE_FLAG;
 pub use self::sys_futex::FUTEX_WAIT_PRIVATE;
 pub use self::sys_futex::FUTEX_WAKE_PRIVATE;
 pub use self::sys_futex::FUTEX_REQUEUE_PRIVATE;
+pub use self::sys_futex::timespec;
 pub use self::sys_futex::futex;
 mod sys_sysctl;
 pub use self::sys_sysctl::CTL_MACHDEP;
