@@ -68,6 +68,18 @@ macro_rules! cfg_sel {
 #[path = "gen/sys/mod.rs"]
 pub mod sys;
 
+// Not public API.
+#[doc(hidden)]
+pub mod __private {
+    pub use core::{
+        mem::{self, align_of, size_of, transmute},
+        primitive::{f64, u128, usize},
+        ptr::addr_of,
+    };
+
+    pub use crate::const_cmp::{Scalar, Value};
+}
+
 /// Static assertions for FFI bindings.
 ///
 /// This checks that FFI bindings defined in this crate and FFI bindings generated for
@@ -129,12 +141,12 @@ macro_rules! static_assert_sys_struct {
                 $(#[$attr])*
                 {
                     $crate::__static_assert!(
-                        ::core::mem::size_of::<$name>()
-                            == ::core::mem::size_of::<sys::$name>()
+                        $crate::__private::size_of::<$name>()
+                            == $crate::__private::size_of::<sys::$name>()
                     );
                     $crate::__static_assert!(
-                        ::core::mem::align_of::<$name>()
-                            == ::core::mem::align_of::<sys::$name>()
+                        $crate::__private::align_of::<$name>()
+                            == $crate::__private::align_of::<sys::$name>()
                     );
                     let _ = |local: &$name, reference: &sys::$name| {
                         // Check missing or extra field.
@@ -144,9 +156,9 @@ macro_rules! static_assert_sys_struct {
                             $(#[$field_attr])*
                             {
                                 // The outer &mut makes the pointee type invariant, preventing implicit field coercions.
-                                let mut local_ptr = ::core::ptr::addr_of!(local.$field_name);
+                                let mut local_ptr = $crate::__private::addr_of!(local.$field_name);
                                 let mut reference_ptr =
-                                    ::core::ptr::addr_of!(reference.$field_name);
+                                    $crate::__private::addr_of!(reference.$field_name);
                                 let _: [&mut *const $field_ty; 2] =
                                     [&mut local_ptr, &mut reference_ptr];
                                 $crate::__static_assert_sys_struct_offset_cmp!($name, $field_name);
@@ -165,8 +177,8 @@ macro_rules! static_assert_sys_struct {
 macro_rules! __static_assert_sys_struct_offset_cmp {
     ($name:ident, $field_name:ident) => {
         $crate::__static_assert!(
-            ::core::mem::offset_of!($name, $field_name)
-                == ::core::mem::offset_of!(sys::$name, $field_name),
+            $crate::__private::mem::offset_of!($name, $field_name)
+                == $crate::__private::mem::offset_of!(sys::$name, $field_name),
         );
     };
 }
@@ -215,13 +227,12 @@ macro_rules! __static_assert_sys_const_cmp {
     ($name:ident, $ty:ty) => {
         $crate::__static_assert!({
             let values = (
-                $crate::__const_cmp::Scalar::<$ty>($name).value(),
-                $crate::__const_cmp::Scalar(sys::$name).value(),
+                $crate::__private::Scalar::<$ty>($name).value(),
+                $crate::__private::Scalar(sys::$name).value(),
             );
             // Comparison code is inlined because float comparison in const fn require Rust 1.82.
             {
-                use ::core::primitive::{f64, u128, usize};
-                use $crate::__const_cmp::Value;
+                use $crate::__private::{Value, f64, u128, usize};
                 match values {
                     (Value::Int(a_negative, a), Value::Int(b_negative, b)) => {
                         a_negative == b_negative && a == b
@@ -241,8 +252,8 @@ macro_rules! __static_assert_sys_const_cmp {
                         // SAFETY: Null and integer-derived FFI sentinels have no allocation
                         // provenance. Const evaluation rejects allocation-backed addresses.
                         unsafe {
-                            ::core::mem::transmute::<*const (), usize>(a)
-                                == ::core::mem::transmute::<*const (), usize>(b)
+                            $crate::__private::transmute::<*const (), usize>(a)
+                                == $crate::__private::transmute::<*const (), usize>(b)
                         }
                     }
                     _ => false,
@@ -252,8 +263,7 @@ macro_rules! __static_assert_sys_const_cmp {
     };
 }
 
-#[doc(hidden)]
-pub mod __const_cmp {
+mod const_cmp {
     pub struct Scalar<T>(pub T);
 
     #[must_use]
