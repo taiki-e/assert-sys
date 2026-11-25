@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod zircon_system_public_zircon_syscalls;
 pub use self::zircon_system_public_zircon_syscalls::zx_futex_t;
 pub use self::zircon_system_public_zircon_syscalls::zx_futex_get_owner;

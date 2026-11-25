@@ -5,7 +5,7 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub type __int32_t = ::std::os::raw::c_int;
+pub type __int32_t = super::ffi::c_int;
 pub type __pid_t = __int32_t;
 pub type pid_t = __pid_t;
 extern "C" {

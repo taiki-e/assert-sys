@@ -6,5 +6,5 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 extern "C" {
-    pub fn syscall(arg1: ::std::os::raw::c_int, ...) -> ::std::os::raw::c_int;
+    pub fn syscall(arg1: super::ffi::c_int, ...) -> super::ffi::c_int;
 }

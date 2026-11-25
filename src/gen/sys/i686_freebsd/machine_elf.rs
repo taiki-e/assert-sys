@@ -8,14 +8,14 @@
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct Elf32_Auxinfo {
-    pub a_type: ::std::os::raw::c_int,
+    pub a_type: super::ffi::c_int,
     pub a_un: Elf32_Auxinfo__bindgen_ty_1,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union Elf32_Auxinfo__bindgen_ty_1 {
-    pub a_val: ::std::os::raw::c_long,
-    pub a_ptr: *mut ::core::ffi::c_void,
+    pub a_val: super::ffi::c_long,
+    pub a_ptr: *mut super::ffi::c_void,
     pub a_fcn: ::core::option::Option<unsafe extern "C" fn()>,
 }
 pub type Elf_Auxinfo = Elf32_Auxinfo;

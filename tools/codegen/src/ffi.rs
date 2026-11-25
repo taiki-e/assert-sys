@@ -917,21 +917,7 @@ pub(crate) fn generate() {
     for &Target { triples, headers } in TARGETS {
         for &triple in triples {
             eprintln!("\ninfo: generating bindings for {triple}");
-            let (ref target, is_custom) = target_spec_json(triple);
-            // loongarch64 support was added in Rust 1.70: https://github.com/rust-lang/rust/pull/96971
-            // csky support was added in Rust 1.73: https://github.com/rust-lang/rust/pull/113658
-            // loongarch32 support was added in Rust 1.89: https://github.com/rust-lang/rust/pull/142053
-            // aix support was added in Rust 1.67: https://github.com/rust-lang/rust/pull/102293
-            // hurd support was added in Rust 1.74: https://github.com/rust-lang/rust/pull/115230
-            // trusty support was added in Rust 1.82: https://github.com/rust-lang/rust/pull/129490
-            // non-x86_64 illumos support was added in Rust 1.77: https://github.com/rust-lang/rust/pull/112936
-            // non-x86_64 l4re support was added in Rust 1.99: https://github.com/rust-lang/rust/pull/150885
-            // riscv64 fuchsia support was added in Rust 1.70: https://github.com/rust-lang/rust/pull/108722
-            let use_core_ffi = is_custom
-                || matches!(target.arch, loongarch64 | csky | loongarch32)
-                || matches!(target.os, aix | hurd | trusty)
-                || matches!(target.os, illumos | l4re) && target.arch != x86_64
-                || target.os == fuchsia && target.arch == riscv64;
+            let target = &target_spec_json(triple);
             let mut module_name = triple
                 .replace(&*format!("-{}-", target.vendor.as_deref().unwrap_or("unknown")), "-")
                 .replace(['-', '.'], "_");
@@ -1181,14 +1167,9 @@ pub(crate) fn generate() {
                     .disable_header_comment()
                     .generate_comments(false)
                     .layout_tests(false)
-                    .rust_target(if use_core_ffi {
-                        // targets without std support
-                        bindgen::RustTarget::Stable_1_64
-                    } else {
-                        // oldest version that portable-atomic uses asm-based code is
-                        // Rust 1.46 (nightly-2020-06-21): https://github.com/taiki-e/portable-atomic/pull/52
-                        bindgen::RustTarget::Stable_1_40
-                    })
+                    // The latest bindgen Rust target compatible with our MSRV (1.56).
+                    .rust_target(bindgen::RustTarget::Stable_1_47)
+                    .ctypes_prefix("super::ffi")
                     .use_core()
                     .formatter(bindgen::Formatter::Prettyplease)
                     .header(header_path.as_str())
@@ -1209,11 +1190,6 @@ pub(crate) fn generate() {
                 bindings.write_to_file(out_path).unwrap_or_else(|e| {
                     panic!("failed to write_to_file for {}: {}", header.path, e)
                 });
-                if use_core_ffi {
-                    // TODO: Workaround for bindgen bug
-                    let f = fs::read_to_string(out_path).unwrap();
-                    fs::write(out_path, f.replace("::std::os::raw::", "::core::ffi::")).unwrap();
-                }
 
                 files.push((out_file, functions, types, vars));
             }
@@ -1286,6 +1262,8 @@ pub(crate) fn generate() {
                 workspace_root.as_std_path(),
                 out_dir.join("mod.rs"),
                 quote! {
+                    #[path = "../../../ffi.rs"]
+                    mod ffi;
                     #(#modules)*
                     pub type c_char = #c_char_type;
                 },
@@ -2142,9 +2120,8 @@ fn illumos_arch(target: &TargetSpec) -> &'static str {
 }
 
 #[track_caller]
-fn target_spec_json(target: &str) -> (TargetSpec, bool) {
+fn target_spec_json(target: &str) -> TargetSpec {
     let spec_path = workspace_root().join("target-specs").join(target).with_extension("json");
-    let is_custom = spec_path.exists();
-    let target = if is_custom { spec_path.as_str() } else { target };
-    (target_spec_json::target_spec_json(Command::new("rustc"), target).unwrap(), is_custom)
+    let target = if spec_path.exists() { spec_path.as_str() } else { target };
+    target_spec_json::target_spec_json(Command::new("rustc"), target).unwrap()
 }

@@ -6,5 +6,5 @@
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 extern "C" {
-    pub fn getauxval(__type: ::core::ffi::c_ulong) -> ::core::ffi::c_ulong;
+    pub fn getauxval(__type: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

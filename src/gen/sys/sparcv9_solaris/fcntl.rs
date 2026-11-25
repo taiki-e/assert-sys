@@ -34,8 +34,8 @@ pub const O_NOSIGPIPE: u32 = 1073741824;
 pub const O_ACCMODE: u32 = 6291459;
 extern "C" {
     pub fn open(
-        arg1: *const ::std::os::raw::c_char,
-        arg2: ::std::os::raw::c_int,
+        arg1: *const super::ffi::c_char,
+        arg2: super::ffi::c_int,
         ...
-    ) -> ::std::os::raw::c_int;
+    ) -> super::ffi::c_int;
 }

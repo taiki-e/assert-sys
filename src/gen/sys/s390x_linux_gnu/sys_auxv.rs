@@ -32,5 +32,5 @@ pub const HWCAP_S390_NNPA: u32 = 1048576;
 pub const HWCAP_S390_PCI_MIO: u32 = 2097152;
 pub const HWCAP_S390_SIE: u32 = 4194304;
 extern "C" {
-    pub fn getauxval(__type: ::std::os::raw::c_ulong) -> ::std::os::raw::c_ulong;
+    pub fn getauxval(__type: super::ffi::c_ulong) -> super::ffi::c_ulong;
 }

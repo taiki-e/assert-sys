@@ -4,6 +4,8 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 mod sys_syscall;
 pub use self::sys_syscall::SYS_MAXSYSARGS;
 pub use self::sys_syscall::SYS_syscall;

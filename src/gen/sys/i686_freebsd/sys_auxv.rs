@@ -7,8 +7,8 @@
 
 extern "C" {
     pub fn elf_aux_info(
-        aux: ::std::os::raw::c_int,
-        buf: *mut ::core::ffi::c_void,
-        buflen: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        aux: super::ffi::c_int,
+        buf: *mut super::ffi::c_void,
+        buflen: super::ffi::c_int,
+    ) -> super::ffi::c_int;
 }

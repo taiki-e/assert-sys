@@ -4,4 +4,6 @@
 // It is not intended for manual editing.
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
+#[path = "../../../ffi.rs"]
+mod ffi;
 pub type c_char = u8;

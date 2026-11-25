@@ -7,14 +7,14 @@
 
 extern "C" {
     pub fn umtx_sleep(
-        arg1: *const ::std::os::raw::c_int,
-        arg2: ::std::os::raw::c_int,
-        arg3: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        arg1: *const super::ffi::c_int,
+        arg2: super::ffi::c_int,
+        arg3: super::ffi::c_int,
+    ) -> super::ffi::c_int;
 }
 extern "C" {
     pub fn umtx_wakeup(
-        arg1: *const ::std::os::raw::c_int,
-        arg2: ::std::os::raw::c_int,
-    ) -> ::std::os::raw::c_int;
+        arg1: *const super::ffi::c_int,
+        arg2: super::ffi::c_int,
+    ) -> super::ffi::c_int;
 }

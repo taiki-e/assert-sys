@@ -5,11 +5,10 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub const RTLD_DEFAULT: *mut ::std::os::raw::c_void = -2i8
-    as *mut ::std::os::raw::c_void;
+pub const RTLD_DEFAULT: *mut super::ffi::c_void = -2i8 as *mut super::ffi::c_void;
 extern "C" {
     pub fn dlsym(
-        arg1: *mut ::core::ffi::c_void,
-        arg2: *const ::std::os::raw::c_char,
-    ) -> *mut ::core::ffi::c_void;
+        arg1: *mut super::ffi::c_void,
+        arg2: *const super::ffi::c_char,
+    ) -> *mut super::ffi::c_void;
 }

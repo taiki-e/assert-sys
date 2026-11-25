@@ -64,12 +64,12 @@ pub const UMTX_SHM_CREAT: u32 = 1;
 pub const UMTX_SHM_LOOKUP: u32 = 2;
 pub const UMTX_SHM_DESTROY: u32 = 4;
 pub const UMTX_SHM_ALIVE: u32 = 8;
-pub type __uint8_t = ::std::os::raw::c_uchar;
-pub type __uint16_t = ::std::os::raw::c_ushort;
-pub type __int32_t = ::std::os::raw::c_int;
-pub type __uint32_t = ::std::os::raw::c_uint;
-pub type __int64_t = ::std::os::raw::c_long;
-pub type __uint64_t = ::std::os::raw::c_ulong;
+pub type __uint8_t = super::ffi::c_uchar;
+pub type __uint16_t = super::ffi::c_ushort;
+pub type __int32_t = super::ffi::c_int;
+pub type __uint32_t = super::ffi::c_uint;
+pub type __int64_t = super::ffi::c_long;
+pub type __uint64_t = super::ffi::c_ulong;
 pub type __uintmax_t = __uint64_t;
 pub type __uintptr_t = __uint64_t;
 pub type __uint64ptr_t = __uint64_t;
@@ -77,13 +77,13 @@ pub type __time_t = __int64_t;
 pub type __u_register_t = __uint64_t;
 pub type __lwpid_t = __int32_t;
 pub type __uid_t = __uint32_t;
-pub type __useconds_t = ::std::os::raw::c_uint;
-pub type u_char = ::std::os::raw::c_uchar;
-pub type u_short = ::std::os::raw::c_ushort;
-pub type u_int = ::std::os::raw::c_uint;
-pub type u_long = ::std::os::raw::c_ulong;
-pub type ushort = ::std::os::raw::c_ushort;
-pub type uint = ::std::os::raw::c_uint;
+pub type __useconds_t = super::ffi::c_uint;
+pub type u_char = super::ffi::c_uchar;
+pub type u_short = super::ffi::c_ushort;
+pub type u_int = super::ffi::c_uint;
+pub type u_long = super::ffi::c_ulong;
+pub type ushort = super::ffi::c_ushort;
+pub type uint = super::ffi::c_uint;
 pub type uint64ptr_t = __uint64ptr_t;
 pub type uintmax_t = __uintmax_t;
 pub type u_int8_t = __uint8_t;
@@ -99,12 +99,12 @@ pub type useconds_t = __useconds_t;
 #[derive(Copy, Clone)]
 pub struct timespec {
     pub tv_sec: time_t,
-    pub tv_nsec: ::std::os::raw::c_long,
+    pub tv_nsec: super::ffi::c_long,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct umtx {
-    pub u_owner: ::std::os::raw::c_ulong,
+    pub u_owner: super::ffi::c_ulong,
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -161,19 +161,19 @@ pub struct umtx_robust_lists_params {
 }
 extern "C" {
     pub fn _umtx_op(
-        obj: *mut ::core::ffi::c_void,
-        op: ::std::os::raw::c_int,
+        obj: *mut super::ffi::c_void,
+        op: super::ffi::c_int,
         val: u_long,
-        uaddr: *mut ::core::ffi::c_void,
-        uaddr2: *mut ::core::ffi::c_void,
-    ) -> ::std::os::raw::c_int;
+        uaddr: *mut super::ffi::c_void,
+        uaddr2: *mut super::ffi::c_void,
+    ) -> super::ffi::c_int;
 }
 extern "C" {
     pub fn _umtx_op_err(
-        obj: *mut ::core::ffi::c_void,
-        op: ::std::os::raw::c_int,
+        obj: *mut super::ffi::c_void,
+        op: super::ffi::c_int,
         val: u_long,
-        uaddr: *mut ::core::ffi::c_void,
-        uaddr2: *mut ::core::ffi::c_void,
-    ) -> ::std::os::raw::c_int;
+        uaddr: *mut super::ffi::c_void,
+        uaddr2: *mut super::ffi::c_void,
+    ) -> super::ffi::c_int;
 }
