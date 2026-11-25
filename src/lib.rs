@@ -370,6 +370,6 @@ macro_rules! __static_assert_sys_import {
 #[doc(hidden)]
 macro_rules! __static_assert {
     ($cond:expr $(,)?) => {{
-        const _: [(); 1] = [(); (true /* type check */ & $cond) as usize];
+        const _: [(); 1] = [(); if $cond { 1 } else { 0 }];
     }};
 }
