@@ -968,6 +968,13 @@ pub(crate) fn generate() {
             let mut first = true;
             let mut src_dir = Utf8PathBuf::new();
             let mut files = vec![];
+            let target_flag = format!("--target={}", target.llvm_target);
+            let clang_target_args: &[&str] = if target.arch == csky {
+                // Clang's default is incorrect: https://github.com/rust-lang/rust/issues/129945
+                &[&target_flag, "-funsigned-char"]
+            } else {
+                &[&target_flag]
+            };
             for &header in headers {
                 if !header.arch.is_empty() && !header.arch.contains(&target.arch) {
                     continue;
@@ -1005,8 +1012,8 @@ pub(crate) fn generate() {
                 );
                 let out_path = &out_dir.join(&out_file);
 
-                let target_flag = &*format!("--target={}", target.llvm_target);
-                let mut clang_args = vec![target_flag, "-nostdinc"];
+                let mut clang_args = clang_target_args.to_vec();
+                clang_args.push("-nostdinc");
                 macro_rules! define {
                     ($name:ident) => {{
                         clang_args.push(concat!("-D", stringify!($name)));
@@ -1253,10 +1260,12 @@ pub(crate) fn generate() {
                 });
             }
             // e.g., clang -E -dM -x c /dev/null -target aarch64-unknown-linux-gnu | grep -F __CHAR_
-            let clang_defs =
-                cmd!("clang", "-E", "-dM", "-x", "c", "/dev/null", "-target", &target.llvm_target)
-                    .read()
-                    .unwrap();
+            let clang_defs = duct::cmd(
+                "clang",
+                clang_target_args.iter().copied().chain(["-E", "-dM", "-x", "c", "/dev/null"]),
+            )
+            .read()
+            .unwrap();
             let c_char_type = if clang_defs.lines().any(|l| l == "#define __CHAR_UNSIGNED__ 1") {
                 quote! { u8 }
             } else {
