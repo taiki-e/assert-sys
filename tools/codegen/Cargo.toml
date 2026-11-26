@@ -11,7 +11,7 @@ duct = { version = "1", default-features = false }
 fs-err = "3"
 regex = { version = "1", default-features = false, features = ["std"] }
 target-spec-json = "0.2"
-test-helper = { features = ["codegen"], git = "https://github.com/taiki-e/test-helper.git", rev = "b931ac1a34794aede5b019c613e50157a35a7ec4" }
+taiki-e-test-helper = { version = "0.1", features = ["codegen"] }
 windows-bindgen = "0.66"
 
 [lints]
