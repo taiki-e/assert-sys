@@ -170,8 +170,8 @@ macro_rules! static_assert_sys_struct {
         };
     };
 }
-// mem::offset_of requires Rust 1.77
-#[rustversion::since(1.77)]
+// mem::offset_of requires Rust 1.77 (nightly-2024-01-21 https://github.com/rust-lang/rust/pull/118799)
+#[rustversion::all(since(1.77), any(not(nightly), since(2024-01-20)))]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __static_assert_sys_struct_offset_cmp {
@@ -182,7 +182,7 @@ macro_rules! __static_assert_sys_struct_offset_cmp {
         );
     };
 }
-#[rustversion::before(1.77)]
+#[rustversion::not(all(since(1.77), any(not(nightly), since(2024-01-20))))]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __static_assert_sys_struct_offset_cmp {
