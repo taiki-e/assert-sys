@@ -173,7 +173,7 @@ macro_rules! static_assert_sys_struct {
 // mem::offset_of requires Rust 1.77 (nightly-2024-01-21 https://github.com/rust-lang/rust/pull/118799)
 #[rustversion::all(since(1.77), any(not(nightly), since(2024-01-20)))]
 #[macro_export]
-#[doc(hidden)]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_struct_offset_cmp {
     ($name:ident, $field_name:ident) => {
         $crate::__static_assert!(
@@ -184,7 +184,7 @@ macro_rules! __static_assert_sys_struct_offset_cmp {
 }
 #[rustversion::not(all(since(1.77), any(not(nightly), since(2024-01-20))))]
 #[macro_export]
-#[doc(hidden)]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_struct_offset_cmp {
     ($name:ident, $field_name:ident) => {};
 }
@@ -222,7 +222,7 @@ macro_rules! static_assert_sys_const {
     };
 }
 #[macro_export]
-#[doc(hidden)]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_const_cmp {
     ($name:ident, $ty:ty) => {
         $crate::__static_assert!({
@@ -330,7 +330,7 @@ macro_rules! static_assert_sys_fn {
     };
 }
 #[macro_export]
-#[doc(hidden)]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_fn_cmp {
     (
         $abi:literal fn $name:ident($($_arg_pat:ident: $arg_ty:ty),*, ...) $(-> $ret_ty:ty)?
@@ -348,6 +348,7 @@ macro_rules! __static_assert_sys_fn_cmp {
 
 #[cfg(any(target_os = "aix", target_os = "hermit", target_os = "nto", target_os = "qnx"))]
 #[macro_export]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_import {
     () => {
         use ::libc as sys;
@@ -355,6 +356,7 @@ macro_rules! __static_assert_sys_import {
 }
 #[cfg(target_os = "redox")]
 #[macro_export]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_import {
     () => {
         use ::syscall as sys;
@@ -368,6 +370,7 @@ macro_rules! __static_assert_sys_import {
     target_os = "redox",
 )))]
 #[macro_export]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_import {
     () => {
         use $crate::sys;
@@ -377,7 +380,7 @@ macro_rules! __static_assert_sys_import {
 // Do not use inline_const-based __static_assert! because it is not always evaluated with `cargo check`
 // (`cargo build` and `cargo test` are fine).
 #[macro_export]
-#[doc(hidden)]
+#[doc(hidden)] // Not public API.
 macro_rules! __static_assert {
     ($cond:expr $(,)?) => {{
         const _: [(); 1] = [(); if $cond { 1 } else { 0 }];
