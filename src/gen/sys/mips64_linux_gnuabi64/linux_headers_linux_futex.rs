@@ -80,6 +80,7 @@ pub const FUTEX_OP_CMP_GT: u32 = 4;
 pub const FUTEX_OP_CMP_GE: u32 = 5;
 pub type __u32 = super::ffi::c_uint;
 pub type __u64 = super::ffi::c_ulong;
+pub const FUTEX_CMD_MASK: super::ffi::c_int = -1921;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct futex_waitv {

@@ -49,6 +49,7 @@ pub const FUTEX_OP_CMP_LT: u32 = 2;
 pub const FUTEX_OP_CMP_LE: u32 = 3;
 pub const FUTEX_OP_CMP_GT: u32 = 4;
 pub const FUTEX_OP_CMP_GE: u32 = 5;
+pub const FUTEX_CMD_MASK: super::ffi::c_int = -385;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct robust_list {

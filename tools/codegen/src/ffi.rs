@@ -1409,8 +1409,11 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
         src_dir
     }
     #[track_caller]
-    fn patch(target: &TargetSpec, src_dir: &Utf8Path) {
-        let patch_dir = workspace_root().join("tools/codegen/patches");
+    fn patch(src_dir: &Utf8Path, contents: &[u8]) {
+        cmd!("patch", "-p1").dir(src_dir).stdin_bytes(contents).run().unwrap();
+    }
+    #[track_caller]
+    fn patch_target(target: &TargetSpec, src_dir: &Utf8Path, patch_dir: &Utf8Path) {
         for path in [
             patch_dir.join(format!("{}.diff", target.os)),
             patch_dir.join(format!("{}-{}.diff", target.os, target.env)),
@@ -1432,19 +1435,17 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
                 android => bionic_dir(src_dir),
                 _ => src_dir.to_owned(),
             };
-            cmd!("patch", "-p1")
-                .stdin_file(fs::File::open(path).unwrap().into_parts().0) // TODO: Buffering?
-                .dir(dir)
-                .run()
-                .unwrap();
+            patch(&dir, &fs::read(path).unwrap());
         }
     }
 
+    let patch_dir = workspace_root().join("tools/codegen/patches");
     let src_dir;
     let mut patched = false;
     match target.os {
         linux | android => {
-            src_dir = if target.arch == aarch64 && target.target_pointer_width == 32 {
+            let arm64_ilp32 = target.arch == aarch64 && target.target_pointer_width == 32;
+            src_dir = if arm64_ilp32 {
                 clone(download_dir, "taiki-e/linux", Some("arm64/staging/ilp32-5.1"), &[])
             } else {
                 clone(download_dir, "torvalds/linux", None, &[
@@ -1456,7 +1457,22 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
             };
             let linux_arch = linux_arch(target);
             let linux_headers_dir = &linux_headers_dir(target, &src_dir);
-            if !linux_headers_dir.exists() {
+            let patch_path = patch_dir.join(if arm64_ilp32 {
+                "linux-uapi-arm64-ilp32.diff"
+            } else {
+                "linux-uapi.diff"
+            });
+            // Refresh existing installations when the UAPI patch is added or changed.
+            let installed_patch = linux_headers_dir.join(".assert-sys-uapi.diff");
+            let patch_contents = fs::read(&patch_path).unwrap();
+            if fs::read(&installed_patch).ok().as_ref() != Some(&patch_contents) {
+                // headers_install can skip a changed header with the same size and mtime.
+                for path in [&installed_patch, &linux_headers_dir.join("include/linux/futex.h")] {
+                    if path.exists() {
+                        fs::remove_file(path).unwrap();
+                    }
+                }
+                patch(&src_dir, &patch_contents);
                 // https://github.com/torvalds/linux/blob/HEAD/Documentation/kbuild/headers_install.rst
                 cmd!(
                     "make",
@@ -1468,6 +1484,7 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
                 .stdout_capture()
                 .run()
                 .unwrap();
+                fs::write(installed_patch, patch_contents).unwrap();
             }
             if target.os == android {
                 clone(
@@ -1501,7 +1518,7 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
                     .unwrap();
                 fs::write(bionic_dir.join("libc/include/float.h"), "").unwrap();
             } else if target.env == gnu && target.arch != csky {
-                if target.arch == aarch64 && target.target_pointer_width == 32 {
+                if arm64_ilp32 {
                     // Keep the ILP32 branch in a separate checkout from glibc's default branch.
                     clone(&download_dir.join("ilp32"), GLIBC_REPO, Some("arm/ilp32"), &[]);
                 } else {
@@ -1873,7 +1890,7 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
         _ => todo!("{target:?}"),
     }
     if !patched {
-        patch(target, &src_dir);
+        patch_target(target, &src_dir, &patch_dir);
     }
     src_dir
 }
