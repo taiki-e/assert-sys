@@ -1,0 +1,15 @@
+diff --git a/include/uapi/linux/futex.h b/include/uapi/linux/futex.h
+index a89eb0acc..236f3469e 100644
+--- a/include/uapi/linux/futex.h
++++ b/include/uapi/linux/futex.h
+@@ -24,7 +24,9 @@
+
+ #define FUTEX_PRIVATE_FLAG	128
+ #define FUTEX_CLOCK_REALTIME	256
+-#define FUTEX_CMD_MASK		~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME)
++#define BINDGEN_CONST(name, expr) static const __typeof__(expr) name = (expr)
++BINDGEN_CONST(FUTEX_CMD_MASK, ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME));
++#undef BINDGEN_CONST
+
+ #define FUTEX_WAIT_PRIVATE	(FUTEX_WAIT | FUTEX_PRIVATE_FLAG)
+ #define FUTEX_WAKE_PRIVATE	(FUTEX_WAKE | FUTEX_PRIVATE_FLAG)

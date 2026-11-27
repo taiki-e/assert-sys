@@ -1,0 +1,17 @@
+diff --git a/include/uapi/linux/futex.h b/include/uapi/linux/futex.h
+index 10a36c551..445e71df9 100644
+--- a/include/uapi/linux/futex.h
++++ b/include/uapi/linux/futex.h
+@@ -28,8 +28,10 @@
+ #define FUTEX_ROBUST_UNLOCK	512
+ #define FUTEX_ROBUST_LIST32	1024
+
+-#define FUTEX_CMD_MASK			~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME | \
+-					  FUTEX_ROBUST_UNLOCK | FUTEX_ROBUST_LIST32)
++#define BINDGEN_CONST(name, expr) static const __typeof__(expr) name = (expr)
++BINDGEN_CONST(FUTEX_CMD_MASK, ~(FUTEX_PRIVATE_FLAG | FUTEX_CLOCK_REALTIME |
++			      FUTEX_ROBUST_UNLOCK | FUTEX_ROBUST_LIST32));
++#undef BINDGEN_CONST
+
+ #define FUTEX_WAIT_PRIVATE		(FUTEX_WAIT | FUTEX_PRIVATE_FLAG)
+ #define FUTEX_WAKE_PRIVATE		(FUTEX_WAKE | FUTEX_PRIVATE_FLAG)

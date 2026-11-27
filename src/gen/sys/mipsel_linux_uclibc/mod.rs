@@ -714,6 +714,7 @@ pub use self::linux_headers_linux_futex::FUTEX_OP_CMP_LT;
 pub use self::linux_headers_linux_futex::FUTEX_OP_CMP_LE;
 pub use self::linux_headers_linux_futex::FUTEX_OP_CMP_GT;
 pub use self::linux_headers_linux_futex::FUTEX_OP_CMP_GE;
+pub use self::linux_headers_linux_futex::FUTEX_CMD_MASK;
 pub use self::linux_headers_linux_futex::futex_waitv;
 pub use self::linux_headers_linux_futex::robust_list;
 pub use self::linux_headers_linux_futex::robust_list_head;
