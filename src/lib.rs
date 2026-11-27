@@ -72,8 +72,8 @@ pub mod sys;
 #[doc(hidden)]
 pub mod __private {
     pub use core::{
-        mem::{self, align_of, size_of, transmute},
-        primitive::{f64, u128, usize},
+        mem::{self, MaybeUninit, align_of, size_of, transmute},
+        primitive::{f64, u8, u128, usize},
         ptr::addr_of,
     };
 
@@ -127,12 +127,9 @@ macro_rules! static_assert_sys_type {
 macro_rules! static_assert_sys_struct {
     ($(
         $(#[$attr:meta])*
-        struct $name:ident {$(
-            $(#[$field_attr:meta])*
-            $field_name:ident: $field_ty:ty,
-        )*}
+        struct $name:ident { $($fields:tt)* }
     )*) => {
-        #[allow(unused_imports)]
+        #[allow(unused_attributes, unused_imports)]
         const _: fn() = || {
             $crate::__static_assert_sys_import!();
             $(
@@ -146,45 +143,152 @@ macro_rules! static_assert_sys_struct {
                         $crate::__private::align_of::<$name>()
                             == $crate::__private::align_of::<sys::$name>()
                     );
-                    let _ = |local: &$name, reference: &sys::$name| {
-                        // Check missing or extra field.
-                        let $name { $($(#[$field_attr])* $field_name: _,)* } = local;
-                        let sys::$name { $($(#[$field_attr])* $field_name: _,)* } = reference;
-                        $(
-                            $(#[$field_attr])*
-                            {
-                                // The outer &mut makes the pointee type invariant, preventing implicit field coercions.
-                                let mut local_ptr = $crate::__private::addr_of!(local.$field_name);
-                                let mut reference_ptr =
-                                    $crate::__private::addr_of!(reference.$field_name);
-                                let _: [&mut *const $field_ty; 2] =
-                                    [&mut local_ptr, &mut reference_ptr];
-                                $crate::__static_assert_sys_struct_offset_cmp!($name, $field_name);
-                            }
-                        )*
-                    };
+                    $crate::__static_assert_sys_struct_fields!(local, $name, { $($fields)* });
+                }
+            )*
+            {
+                $(
+                    $(#[$attr])*
+                    {
+                        $crate::__static_assert_sys_struct_fields!(
+                            reference, $name, { $($fields)* }
+                        );
+                    }
+                )*
+
+                // Item aliases are visible throughout this block. Place the temporary
+                // macros after the checks so they cannot shadow a caller's type macros.
+                $(
+                    #[allow(unused_macros)]
+                    macro_rules! $name {
+                        () => {
+                            #[allow(deprecated, non_camel_case_types)]
+                            type $name = sys::$name;
+                        };
+                    }
+                )*
+                $(
+                    $(#[$attr])*
+                    $name!();
+                    // A repeated assertion of the same type needs only one alias.
+                    $(#[$attr])*
+                    #[allow(unused_macros)]
+                    macro_rules! $name { () => {}; }
+                )*
+            }
+        };
+    };
+}
+
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __static_assert_sys_struct_fields {
+    ($side:ident, $name:ident, { $(
+        $(#[$attr:meta])* $field:ident: $ty:ty $({ $($members:tt)+ })?,
+    )* }) => {
+        let _ = |value: &$name| {
+            // Reject missing or extra fields in either binding.
+            let $name { $($(#[$attr])* $field: _,)* } = value;
+            let base = value as *const $name;
+            $(
+                $(#[$attr])*
+                {
+                    $crate::__static_assert_sys_struct_offset_cmp!($side, $name, $field);
+                    $crate::__static_assert_sys_struct_field!(
+                        $side, $name, base, (*base).$field, $ty $(, { $($members)+ })?
+                    );
                 }
             )*
         };
     };
 }
+
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __static_assert_sys_struct_field {
+    ($side:ident, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
+        // SAFETY: Projecting a field address neither reads a union nor borrows a packed field.
+        let mut ptr = unsafe { $crate::__private::addr_of!($place) };
+        // The outer &mut makes the pointee type invariant, preventing implicit coercions.
+        let _: &mut *const $ty = &mut ptr;
+    }};
+    ($side:ident, $name:ident, $base:ident, $place:expr, $ty:ty, { $(
+        $(#[$attr:meta])* $member:ident: $member_ty:ty $({ $($nested:tt)+ })?,
+    )+ }) => {{
+        $crate::__static_assert_sys_struct_field!(@layout $side, $name, $base, $place, $ty);
+        $(
+            $(#[$attr])*
+            {
+                $crate::__static_assert_sys_struct_offset_cmp!($side, $name, $base, $place.$member);
+                $crate::__static_assert_sys_struct_field!(
+                    $side, $name, $base, $place.$member, $member_ty $(, { $($nested)+ })?
+                );
+            }
+        )+
+    }};
+    (@layout reference, $name:ident, $base:ident, $place:expr, $ty:ty) => {};
+    (@layout local, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
+        $crate::__static_assert_sys_struct_field!(local, $name, $base, $place, $ty);
+        $crate::__static_assert!({
+            // SAFETY: Only the return type of this projection is used.
+            $crate::__AssertSysField(|$base: *const sys::$name| unsafe {
+                $crate::__private::addr_of!($place)
+            }).has_layout_of::<$ty>()
+        });
+    }};
+}
+
+// A bindgen field's type can be public inside a private module. Infer it from a
+// projection without constructing the field. Rust 1.56 permits const methods on
+// this wrapper but not function pointer parameters on const fn.
+#[doc(hidden)]
+pub struct __AssertSysField<P, F>(pub fn(*const P) -> *const F);
+impl<P, F> __AssertSysField<P, F> {
+    #[must_use]
+    #[allow(clippy::unused_self)] // The receiver determines F.
+    pub const fn has_layout_of<T>(&self) -> bool {
+        core::mem::size_of::<F>() == core::mem::size_of::<T>()
+            && core::mem::align_of::<F>() == core::mem::align_of::<T>()
+    }
+}
+
+// Nested field paths in offset_of! were still unstable in Rust 1.77.
 // mem::offset_of requires Rust 1.77 (nightly-2024-01-21 https://github.com/rust-lang/rust/pull/118799)
 #[rustversion::all(since(1.77), any(not(nightly), since(2024-01-20)))]
 #[macro_export]
 #[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_struct_offset_cmp {
-    ($name:ident, $field_name:ident) => {
+    (reference, $($unused:tt)*) => {};
+    (local, $name:ident, $field:ident) => {
         $crate::__static_assert!(
-            $crate::__private::mem::offset_of!($name, $field_name)
-                == $crate::__private::mem::offset_of!(sys::$name, $field_name),
+            $crate::__private::mem::offset_of!($name, $field)
+                == $crate::__private::mem::offset_of!(sys::$name, $field),
         );
+    };
+    (local, $name:ident, $base:ident, $place:expr) => {
+        $crate::__static_assert!({
+            macro_rules! offset {
+                ($parent:ty) => {{
+                    let storage = $crate::__private::MaybeUninit::<$parent>::uninit();
+                    let $base = storage.as_ptr();
+                    // SAFETY: Both pointers belong to storage. Projecting the field address
+                    // neither reads the uninitialized bytes nor forms an unaligned reference.
+                    unsafe {
+                        $crate::__private::addr_of!($place)
+                            .cast::<$crate::__private::u8>()
+                            .offset_from($base.cast::<$crate::__private::u8>())
+                    }
+                }};
+            }
+            offset!($name) == offset!(sys::$name)
+        });
     };
 }
 #[rustversion::not(all(since(1.77), any(not(nightly), since(2024-01-20))))]
 #[macro_export]
 #[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_struct_offset_cmp {
-    ($name:ident, $field_name:ident) => {};
+    ($($unused:tt)*) => {};
 }
 
 /// Static assertions for FFI bindings.
