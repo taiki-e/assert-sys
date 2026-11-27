@@ -343,8 +343,6 @@ static TARGETS: &[Target] = &[
             "aarch64-apple-visionos",
             "aarch64-apple-watchos",
             "arm64_32-apple-watchos",
-            // "armv7k-apple-watchos",
-            // "armv7s-apple-ios",
             "x86_64-apple-darwin",
         ],
         headers: &[
@@ -1035,11 +1033,12 @@ pub(crate) fn generate() {
                             src_dir.parent().unwrap().join("Libc/include"),
                             src_dir.parent().unwrap().join("libpthread/include"),
                         ];
-                        // https://github.com/apple-oss-distributions/xnu/blob/xnu-12377.121.6/bsd/sys/cdefs.h#L654
                         if header.path == "sys/errno.h" {
-                            // EOWNERDEAD and ENOTRECOVERABLE require POSIX.1-2008.
-                            define!(_POSIX_C_SOURCE, "200809L");
+                            // Include Darwin extensions and retain UNIX03 errno values.
+                            define!(_DARWIN_C_SOURCE);
                         } else {
+                            // Use portable definition for _POSIX_C_SOURCE by default.
+                            // https://github.com/apple-oss-distributions/xnu/blob/xnu-12377.121.6/bsd/sys/cdefs.h#L654
                             define!(_POSIX_C_SOURCE, "200112L");
                         }
                         include_header!("sys/_types/_u_char.h");
