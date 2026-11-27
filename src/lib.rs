@@ -82,12 +82,11 @@ pub mod __private {
 
 /// Static assertions for FFI bindings.
 ///
-/// This checks that FFI bindings defined in this crate and FFI bindings generated for
-/// the platform's latest header file using bindgen have the same types.
+/// This checks that FFI bindings defined in user code and FFI bindings generated for
+/// the platform have the same types.
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
-/// See also tools/codegen/src/ffi.rs.
 #[macro_export]
 macro_rules! static_assert_sys_type {
     ($(
@@ -119,12 +118,11 @@ macro_rules! static_assert_sys_type {
 
 /// Static assertions for FFI bindings.
 ///
-/// This checks that FFI bindings defined in this crate and FFI bindings generated for
-/// the platform's latest header file using bindgen have the same fields.
+/// This checks that FFI bindings defined in user code and FFI bindings generated for
+/// the platform have the same structs.
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
-/// See also tools/codegen/src/ffi.rs.
 #[macro_export]
 macro_rules! static_assert_sys_struct {
     ($(
@@ -191,12 +189,11 @@ macro_rules! __static_assert_sys_struct_offset_cmp {
 
 /// Static assertions for FFI bindings.
 ///
-/// This checks that FFI bindings defined in this crate and FFI bindings generated for
-/// the platform's latest header file using bindgen have the same values.
+/// This checks that FFI bindings defined in user code and FFI bindings generated for
+/// the platform have the same values.
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
-/// See also tools/codegen/src/ffi.rs.
 #[macro_export]
 macro_rules! static_assert_sys_const {
     ($(
@@ -302,12 +299,11 @@ mod const_cmp {
 
 /// Static assertions for FFI bindings.
 ///
-/// This checks that FFI bindings defined in this crate and FFI bindings generated for
-/// the platform's latest header file using bindgen have the same signatures.
+/// This checks that FFI bindings defined in user code and FFI bindings generated for
+/// the platform have the same signatures.
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
-/// See also tools/codegen/src/ffi.rs.
 #[macro_export]
 macro_rules! static_assert_sys_fn {
     (
