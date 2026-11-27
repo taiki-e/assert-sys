@@ -5,16 +5,6 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
-pub const HWCAP_ISA_I: super::ffi::c_int = 256;
-pub const HWCAP_ISA_M: super::ffi::c_int = 4096;
-pub const HWCAP_ISA_A: super::ffi::c_int = 1;
-pub const HWCAP_ISA_F: super::ffi::c_int = 32;
-pub const HWCAP_ISA_D: super::ffi::c_int = 8;
-pub const HWCAP_ISA_C: super::ffi::c_int = 4;
-pub const HWCAP_ISA_H: super::ffi::c_int = 128;
-pub const HWCAP_ISA_V: super::ffi::c_int = 2097152;
-pub const HWCAP_ISA_G: super::ffi::c_int = 4393;
-pub const HWCAP_ISA_B: super::ffi::c_int = 2;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct Elf32_Auxinfo {
@@ -40,3 +30,13 @@ pub union Elf64_Auxinfo__bindgen_ty_1 {
     pub a_fcn: ::core::option::Option<unsafe extern "C" fn()>,
 }
 pub type Elf_Auxinfo = Elf64_Auxinfo;
+pub const HWCAP_ISA_I: super::ffi::c_int = 256;
+pub const HWCAP_ISA_M: super::ffi::c_int = 4096;
+pub const HWCAP_ISA_A: super::ffi::c_int = 1;
+pub const HWCAP_ISA_F: super::ffi::c_int = 32;
+pub const HWCAP_ISA_D: super::ffi::c_int = 8;
+pub const HWCAP_ISA_C: super::ffi::c_int = 4;
+pub const HWCAP_ISA_H: super::ffi::c_int = 128;
+pub const HWCAP_ISA_V: super::ffi::c_int = 2097152;
+pub const HWCAP_ISA_G: super::ffi::c_int = 4393;
+pub const HWCAP_ISA_B: super::ffi::c_int = 2;
