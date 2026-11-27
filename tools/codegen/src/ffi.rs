@@ -150,8 +150,7 @@ static TARGETS: &[Target] = &[
                 // https://github.com/torvalds/linux/blob/HEAD/arch/x86/include/uapi/asm/hwcap2.h
                 path: "linux-headers:asm/hwcap.h",
                 types: &[],
-                // TODO: COMPAT_HWCAP.* for riscv
-                vars: &["HWCAP.*"],
+                vars: &["HWCAP.*", "COMPAT_HWCAP.*"],
                 functions: &[],
                 arch: &[aarch64, arm, loongarch64, mips, mips32r6, mips64, mips64r6, riscv32, riscv64],
                 os: &[],
@@ -471,8 +470,7 @@ static TARGETS: &[Target] = &[
                 types: &["Elf.*_Auxinfo"],
                 vars: &["HWCAP.*"],
                 functions: &[],
-                // TODO: riscv
-                arch: &[aarch64, arm, powerpc, powerpc64, x86, x86_64],
+                arch: &[],
                 os: &[],
                 env: &[],
             },
@@ -661,24 +659,14 @@ static TARGETS: &[Target] = &[
                 // https://github.com/openbsd/src/blob/HEAD/sys/arch/mips64/include/elf.h
                 // https://github.com/openbsd/src/blob/HEAD/sys/arch/powerpc/include/elf.h
                 // https://github.com/openbsd/src/blob/HEAD/sys/arch/powerpc64/include/elf.h
+                // https://github.com/openbsd/src/blob/HEAD/sys/arch/riscv64/include/elf.h
                 // https://github.com/openbsd/src/blob/HEAD/sys/arch/sparc64/include/elf.h
                 // https://github.com/openbsd/src/blob/HEAD/sys/arch/amd64/include/elf.h
                 path: "machine/elf.h",
                 types: &[],
                 vars: &["HWCAP.*", "PPC_FEATURE.*"],
                 functions: &[],
-                arch: &[aarch64, arm, mips64, mips64r6, powerpc, powerpc64, sparc64, x86, x86_64],
-                os: &[],
-                env: &[],
-            },
-            Header {
-                // https://github.com/openbsd/src/blob/HEAD/sys/arch/riscv64/include/elf.h
-                path: "machine/elf.h",
-                types: &[],
-                vars: &["HWCAP2_.*"],
-                functions: &[],
-                // TODO: HWCAP_
-                arch: &[riscv64],
+                arch: &[],
                 os: &[],
                 env: &[],
             },
@@ -1467,7 +1455,12 @@ fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf
             let patch_contents = fs::read(&patch_path).unwrap();
             if fs::read(&installed_patch).ok().as_ref() != Some(&patch_contents) {
                 // headers_install can skip a changed header with the same size and mtime.
-                for path in [&installed_patch, &linux_headers_dir.join("include/linux/futex.h")] {
+                let mut paths =
+                    vec![installed_patch.clone(), linux_headers_dir.join("include/linux/futex.h")];
+                if linux_arch == "riscv" {
+                    paths.push(linux_headers_dir.join("include/asm/hwcap.h"));
+                }
+                for path in paths {
                     if path.exists() {
                         fs::remove_file(path).unwrap();
                     }

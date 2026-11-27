@@ -1,0 +1,33 @@
+diff --git a/sys/riscv/include/elf.h b/sys/riscv/include/elf.h
+index aa5c131..a9834d8 100644
+--- a/sys/riscv/include/elf.h
++++ b/sys/riscv/include/elf.h
+@@ -75,15 +75,17 @@ __ElfType(Auxinfo);
+ /* Flags passed in AT_HWCAP */
+ #define	HWCAP_ISA_BIT(c)	(1 << ((c) - 'a'))
+-#define	HWCAP_ISA_I		HWCAP_ISA_BIT('i')
+-#define	HWCAP_ISA_M		HWCAP_ISA_BIT('m')
+-#define	HWCAP_ISA_A		HWCAP_ISA_BIT('a')
+-#define	HWCAP_ISA_F		HWCAP_ISA_BIT('f')
+-#define	HWCAP_ISA_D		HWCAP_ISA_BIT('d')
+-#define	HWCAP_ISA_C		HWCAP_ISA_BIT('c')
+-#define	HWCAP_ISA_H		HWCAP_ISA_BIT('h')
+-#define	HWCAP_ISA_V		HWCAP_ISA_BIT('v')
+-#define	HWCAP_ISA_G		\
+-    (HWCAP_ISA_I | HWCAP_ISA_M | HWCAP_ISA_A | HWCAP_ISA_F | HWCAP_ISA_D)
+-#define	HWCAP_ISA_B		HWCAP_ISA_BIT('b')
++#define BINDGEN_CONST(name, expr) static const __typeof__(expr) name = (expr)
++BINDGEN_CONST(HWCAP_ISA_I, HWCAP_ISA_BIT('i'));
++BINDGEN_CONST(HWCAP_ISA_M, HWCAP_ISA_BIT('m'));
++BINDGEN_CONST(HWCAP_ISA_A, HWCAP_ISA_BIT('a'));
++BINDGEN_CONST(HWCAP_ISA_F, HWCAP_ISA_BIT('f'));
++BINDGEN_CONST(HWCAP_ISA_D, HWCAP_ISA_BIT('d'));
++BINDGEN_CONST(HWCAP_ISA_C, HWCAP_ISA_BIT('c'));
++BINDGEN_CONST(HWCAP_ISA_H, HWCAP_ISA_BIT('h'));
++BINDGEN_CONST(HWCAP_ISA_V, HWCAP_ISA_BIT('v'));
++BINDGEN_CONST(HWCAP_ISA_G,
++    HWCAP_ISA_I | HWCAP_ISA_M | HWCAP_ISA_A | HWCAP_ISA_F | HWCAP_ISA_D);
++BINDGEN_CONST(HWCAP_ISA_B, HWCAP_ISA_BIT('b'));
++#undef BINDGEN_CONST
+
+ #endif /* !_MACHINE_ELF_H_ */

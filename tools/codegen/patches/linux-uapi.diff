@@ -1,3 +1,31 @@
+diff --git a/arch/riscv/include/uapi/asm/hwcap.h b/arch/riscv/include/uapi/asm/hwcap.h
+index 96b7cf854..603b22598 100644
+--- a/arch/riscv/include/uapi/asm/hwcap.h
++++ b/arch/riscv/include/uapi/asm/hwcap.h
+@@ -15,13 +15,15 @@
+  * threading libraries must be able to examine the actual machine state in
+  * order to fully reconstruct the state of a thread.
+  */
+-#define COMPAT_HWCAP_ISA_I	(1 << ('I' - 'A'))
+-#define COMPAT_HWCAP_ISA_M	(1 << ('M' - 'A'))
+-#define COMPAT_HWCAP_ISA_A	(1 << ('A' - 'A'))
+-#define COMPAT_HWCAP_ISA_F	(1 << ('F' - 'A'))
+-#define COMPAT_HWCAP_ISA_D	(1 << ('D' - 'A'))
+-#define COMPAT_HWCAP_ISA_C	(1 << ('C' - 'A'))
+-#define COMPAT_HWCAP_ISA_B	(1 << ('B' - 'A'))
+-#define COMPAT_HWCAP_ISA_V	(1 << ('V' - 'A'))
++#define BINDGEN_CONST(name, expr) static const __typeof__(expr) name = (expr)
++BINDGEN_CONST(COMPAT_HWCAP_ISA_I, 1 << ('I' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_M, 1 << ('M' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_A, 1 << ('A' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_F, 1 << ('F' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_D, 1 << ('D' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_C, 1 << ('C' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_B, 1 << ('B' - 'A'));
++BINDGEN_CONST(COMPAT_HWCAP_ISA_V, 1 << ('V' - 'A'));
++#undef BINDGEN_CONST
+
+ #endif /* _UAPI_ASM_RISCV_HWCAP_H */
 diff --git a/include/uapi/linux/futex.h b/include/uapi/linux/futex.h
 index 10a36c551..445e71df9 100644
 --- a/include/uapi/linux/futex.h

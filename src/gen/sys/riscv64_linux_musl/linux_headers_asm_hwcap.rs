@@ -5,3 +5,11 @@
 
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
+pub const COMPAT_HWCAP_ISA_I: super::ffi::c_int = 256;
+pub const COMPAT_HWCAP_ISA_M: super::ffi::c_int = 4096;
+pub const COMPAT_HWCAP_ISA_A: super::ffi::c_int = 1;
+pub const COMPAT_HWCAP_ISA_F: super::ffi::c_int = 32;
+pub const COMPAT_HWCAP_ISA_D: super::ffi::c_int = 8;
+pub const COMPAT_HWCAP_ISA_C: super::ffi::c_int = 4;
+pub const COMPAT_HWCAP_ISA_B: super::ffi::c_int = 2;
+pub const COMPAT_HWCAP_ISA_V: super::ffi::c_int = 2097152;
