@@ -523,7 +523,6 @@ static TARGETS: &[Target] = &[
                 // https://github.com/NetBSD/src/blob/HEAD/sys/sys/futex.h
                 path: "sys/futex.h",
                 types: &[],
-                // TODO: FUTEX_PRIVATE_FLAG
                 vars: &["FUTEX.*"],
                 functions: &[],
                 arch: &[],
