@@ -314,4 +314,5 @@ pub use self::sys_auxv::AV_SPARC_HWDIV_32x32;
 pub use self::sys_auxv::AV_SPARC_HWFSMULD;
 pub use self::sys_auxv::auxv_t;
 pub use self::sys_auxv::getisax;
+field_count!(sys_auxv::auxv_t__bindgen_ty_1, 3usize);
 pub type c_char = i8;

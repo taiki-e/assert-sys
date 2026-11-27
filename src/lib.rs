@@ -65,6 +65,14 @@ macro_rules! cfg_sel {
     };
 }
 
+// Used by codegen for records that occur as fields of other records.
+#[allow(unused_macros)]
+macro_rules! field_count {
+    ($ty:path, $count:expr) => {
+        impl crate::__private::FieldCount<$count> for $ty {}
+    };
+}
+
 #[path = "gen/sys/mod.rs"]
 pub mod sys;
 
@@ -78,6 +86,57 @@ pub mod __private {
     };
 
     pub use crate::const_cmp::{Scalar, Value};
+
+    pub trait FieldCount<const COUNT: usize> {}
+
+    pub trait Corresponds<Tag, R: ?Sized> {}
+    impl<T, L: ?Sized + Corresponds<T, R>, R: ?Sized> Corresponds<T, *const R> for *const L {}
+    impl<T, L: ?Sized + Corresponds<T, R>, R: ?Sized> Corresponds<T, *mut R> for *mut L {}
+    impl<Tag, L: Corresponds<Tag, R>, R, const N: usize> Corresponds<Tag, [R; N]> for [L; N] {}
+
+    // Start with the two actual field types, inferred invariantly from their addresses.
+    // Each autoderef step tries the next record declared in this invocation.
+    pub struct FieldPair<L, R, Tags>(core::marker::PhantomData<(*mut L, *mut R, Tags)>);
+    pub struct FieldProof<L, R, Kind>(core::marker::PhantomData<(*mut L, *mut R, Kind)>);
+
+    pub trait Matches {}
+    impl<T> Matches for FieldProof<T, T, ()> {}
+    impl<L: Corresponds<Tag, R>, R, Tag> Matches for FieldProof<L, R, (Tag,)> {}
+
+    impl<L, R, Tags> FieldPair<L, R, Tags> {
+        #[must_use]
+        pub fn new(_: &mut *const L, _: &mut *const R, _: &Tags) -> Self {
+            Self(core::marker::PhantomData)
+        }
+        // Recheck the selected witness against the original invariant types. A method
+        // from the caller's scope cannot prove an unrelated pair by returning ! or T.
+        #[allow(clippy::unused_self)]
+        pub fn require<Kind>(&self, _: FieldProof<L, R, Kind>)
+        where
+            FieldProof<L, R, Kind>: Matches,
+        {
+        }
+    }
+    impl<T> FieldPair<T, T, ()> {
+        #[must_use]
+        #[allow(clippy::unused_self)]
+        pub fn __assert_sys_field_matches(&self) -> FieldProof<T, T, ()> {
+            FieldProof(core::marker::PhantomData)
+        }
+    }
+    impl<L: Corresponds<Tag, R>, R, Tag, Rest> FieldPair<L, R, (Tag, Rest)> {
+        #[must_use]
+        #[allow(clippy::unused_self)]
+        pub fn __assert_sys_field_matches(&self) -> FieldProof<L, R, (Tag,)> {
+            FieldProof(core::marker::PhantomData)
+        }
+    }
+    impl<L, R, Tag, Rest> core::ops::Deref for FieldPair<L, R, (Tag, Rest)> {
+        type Target = FieldPair<L, R, Rest>;
+        fn deref(&self) -> &Self::Target {
+            &FieldPair(core::marker::PhantomData)
+        }
+    }
 }
 
 /// Static assertions for FFI bindings.
@@ -120,9 +179,22 @@ macro_rules! static_assert_sys_type {
 ///
 /// This checks that FFI bindings defined in user code and FFI bindings generated for
 /// the platform have the same structs.
+/// Each nested member list must name every member in the generated reference
+/// record exactly once after `cfg` evaluation. This form requires the field
+/// metadata generated for `assert_sys::sys`. Local-only members in a user union
+/// are outside this check because Rust cannot enumerate them.
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
+#[cfg_attr(
+    all(
+        target_os = "linux",
+        target_arch = "x86_64",
+        target_pointer_width = "64",
+        target_env = "gnu"
+    ),
+    doc = include_str!("../tests/field_types.md")
+)]
 #[macro_export]
 macro_rules! static_assert_sys_struct {
     ($(
@@ -132,6 +204,25 @@ macro_rules! static_assert_sys_struct {
         #[allow(unused_attributes, unused_imports)]
         const _: fn() = || {
             $crate::__static_assert_sys_import!();
+            // Give each assertion its own tag, even when two names alias the same record.
+            let __assert_sys_tags = ();
+            $(
+                $(#[$attr])*
+                let __assert_sys_tags = {
+                    struct RecordTag;
+                    impl $crate::__private::Corresponds<RecordTag, sys::$name> for $name {}
+                    (RecordTag, __assert_sys_tags)
+                };
+            )*
+            #[allow(unused_macros)]
+            macro_rules! __assert_sys_check_field_pair {
+                ($local:expr, $reference:expr) => {{
+                    let pair =
+                        $crate::__private::FieldPair::new($local, $reference, &__assert_sys_tags);
+                    pair.require(pair.__assert_sys_field_matches());
+                }};
+            }
+
             $(
                 $(#[$attr])*
                 {
@@ -206,16 +297,30 @@ macro_rules! __static_assert_sys_struct_fields {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __static_assert_sys_struct_field {
-    ($side:ident, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
+    (local, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
+        let mut local = $crate::__static_assert_sys_struct_field!(@typed $place, $ty);
+        let _ = |$base: *const sys::$name| {
+            // SAFETY: Taking the field address does not read through the pointer.
+            let mut reference = unsafe { $crate::__private::addr_of!($place) };
+            __assert_sys_check_field_pair!(&mut local, &mut reference);
+        };
+    }};
+    (reference, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
+        let _ = $crate::__static_assert_sys_struct_field!(@typed $place, $ty);
+    }};
+    (@typed $place:expr, $ty:ty) => {{
         // SAFETY: Projecting a field address neither reads a union nor borrows a packed field.
         let mut ptr = unsafe { $crate::__private::addr_of!($place) };
         // The outer &mut makes the pointee type invariant, preventing implicit coercions.
         let _: &mut *const $ty = &mut ptr;
+        ptr
     }};
     ($side:ident, $name:ident, $base:ident, $place:expr, $ty:ty, { $(
         $(#[$attr:meta])* $member:ident: $member_ty:ty $({ $($nested:tt)+ })?,
     )+ }) => {{
-        $crate::__static_assert_sys_struct_field!(@layout $side, $name, $base, $place, $ty);
+        $crate::__static_assert_sys_struct_field!(
+            @layout $side, $name, $base, $place, $ty, { $($(#[$attr])* $member,)+ }
+        );
         $(
             $(#[$attr])*
             {
@@ -226,14 +331,29 @@ macro_rules! __static_assert_sys_struct_field {
             }
         )+
     }};
-    (@layout reference, $name:ident, $base:ident, $place:expr, $ty:ty) => {};
-    (@layout local, $name:ident, $base:ident, $place:expr, $ty:ty) => {{
-        $crate::__static_assert_sys_struct_field!(local, $name, $base, $place, $ty);
+    (@layout reference, $($unused:tt)*) => {};
+    (@layout local, $name:ident, $base:ident, $place:expr, $ty:ty, {
+        $($(#[$attr:meta])* $member:ident,)+
+    }) => {{
+        let _ = $crate::__static_assert_sys_struct_field!(@typed $place, $ty);
         $crate::__static_assert!({
             // SAFETY: Only the return type of this projection is used.
-            $crate::__AssertSysField(|$base: *const sys::$name| unsafe {
+            let field = $crate::__AssertSysField(|$base: *const sys::$name| unsafe {
                 $crate::__private::addr_of!($place)
-            }).has_layout_of::<$ty>()
+            });
+            let _ = || field.check_field_count::<{
+                // Duplicate names are rejected. Each active member adds one byte.
+                #[allow(dead_code, non_snake_case)]
+                #[repr(C)]
+                struct Members {
+                    $($(#[$attr])* $member: $crate::__private::u8,)+
+                }
+                $crate::__private::size_of::<Members>()
+            }>();
+            // SAFETY: Infer the local field type from an address projection as above.
+            field.has_layout_of(&$crate::__AssertSysField(|$base: *const $name| unsafe {
+                $crate::__private::addr_of!($place)
+            }))
         });
     }};
 }
@@ -244,11 +364,18 @@ macro_rules! __static_assert_sys_struct_field {
 #[doc(hidden)]
 pub struct __AssertSysField<P, F>(pub fn(*const P) -> *const F);
 impl<P, F> __AssertSysField<P, F> {
-    #[must_use]
     #[allow(clippy::unused_self)] // The receiver determines F.
-    pub const fn has_layout_of<T>(&self) -> bool {
-        core::mem::size_of::<F>() == core::mem::size_of::<T>()
-            && core::mem::align_of::<F>() == core::mem::align_of::<T>()
+    pub fn check_field_count<const COUNT: usize>(&self)
+    where
+        F: __private::FieldCount<COUNT>,
+    {
+    }
+
+    #[must_use]
+    #[allow(clippy::unused_self)] // The two projections determine the field types.
+    pub const fn has_layout_of<P2, F2>(&self, _: &__AssertSysField<P2, F2>) -> bool {
+        core::mem::size_of::<F>() == core::mem::size_of::<F2>()
+            && core::mem::align_of::<F>() == core::mem::align_of::<F2>()
     }
 }
 
@@ -408,8 +535,57 @@ mod const_cmp {
 /// Since this is static assertion, we can detect problems with
 /// `cargo check --tests --target <target>` run in CI
 /// without actually running tests on these platforms.
+///
+/// When a parameter is a raw pointer to a separately declared struct, include
+/// the struct assertion before the extern block. Its fields are checked by
+/// `static_assert_sys_struct!`. In a parameter such as `*const timespec` or
+/// `*mut timespec`, the bare struct name then denotes the corresponding type
+/// on each side. Other types, including aggregates passed by value, still
+/// require the same Rust type.
+///
+/// ```ignore
+/// static_assert_sys_fn! {
+///     struct timespec { tv_sec: i64, tv_nsec: i64, }
+///     extern "C" {
+///         fn futex(addr: *mut u32, op: i32, val: i32, ts: *const timespec, addr2: *mut u32) -> i32;
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! static_assert_sys_fn {
+    (
+        $(struct $record:ident { $($fields:tt)* })+
+        $(#[$extern_attr:meta])*
+        extern $abi:literal {$(
+            $(#[$fn_attr:meta])*
+            fn $name:ident($($args:tt)*) $(-> $ret:ty)?;
+        )*}
+    ) => {
+        $(#[$extern_attr])*
+        #[allow(unused_attributes, unused_imports, unused_macros)]
+        const _: () = {
+            $crate::static_assert_sys_struct! { $(struct $record { $($fields)* })+ }
+            $crate::__static_assert_sys_import!();
+            macro_rules! __local_pointee {
+                ($other:ident) => { $other };
+            }
+            macro_rules! __reference_pointee {
+                $(($record) => { sys::$record };)+
+                ($other:ident) => { $other };
+            }
+            $(
+                $(#[$fn_attr])*
+                const _: () = {
+                    const _: $crate::__static_assert_sys_fn_type!(
+                        __local_pointee $abi ($($args)*) $(-> $ret)?
+                    ) = $name;
+                    const _: $crate::__static_assert_sys_fn_type!(
+                        __reference_pointee $abi ($($args)*) $(-> $ret)?
+                    ) = sys::$name;
+                };
+            )*
+        };
+    };
     (
         $(#[$extern_attr:meta])*
         extern $abi:literal {$(
@@ -429,6 +605,32 @@ macro_rules! static_assert_sys_fn {
         };
     };
 }
+// Only raw-pointer parameters participate in the record mapping. Rebinding
+// all type names would also admit distinct by-value ABIs with equal layouts.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __static_assert_sys_fn_type {
+    ($map:ident $abi:literal ($($args:tt)*) $(-> $ret:ty)?) => {
+        $crate::__static_assert_sys_fn_type!(@args $map $abi [$(-> $ret)?] [] $($args)* ,)
+    };
+    (@args $map:ident $abi:literal $ret:tt [$($out:tt)*]
+        $arg:tt : * $qual:ident $pointee:ident, $($rest:tt)*) => {
+        $crate::__static_assert_sys_fn_type!(
+            @args $map $abi $ret [$($out)* *$qual $map!($pointee),] $($rest)*
+        )
+    };
+    (@args $map:ident $abi:literal $ret:tt [$($out:tt)*]
+        $arg:tt : $ty:ty, $($rest:tt)*) => {
+        $crate::__static_assert_sys_fn_type!(@args $map $abi $ret [$($out)* $ty,] $($rest)*)
+    };
+    (@args $map:ident $abi:literal [$($ret:tt)*] [$($out:tt)*] ..., ) => {
+        unsafe extern $abi fn($($out)* ...) $($ret)*
+    };
+    (@args $map:ident $abi:literal [$($ret:tt)*] [$($out:tt)*] $(,)?) => {
+        unsafe extern $abi fn($($out)*) $($ret)*
+    };
+}
+
 #[macro_export]
 #[doc(hidden)] // Not public API.
 macro_rules! __static_assert_sys_fn_cmp {

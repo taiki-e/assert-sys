@@ -10,7 +10,7 @@
 //
 // See also https://github.com/rust-lang/libc/issues/570.
 
-use std::{convert::TryInto as _, env, process::Command};
+use std::{collections::BTreeMap, convert::TryInto as _, env, process::Command};
 
 use camino::{Utf8Path, Utf8PathBuf};
 use duct::cmd;
@@ -1136,6 +1136,9 @@ pub(crate) fn generate() {
                 let types = Regex::new(&format!("^({types})$")).unwrap();
                 let vars = Regex::new(&format!("^({vars})$")).unwrap();
                 let f = syn::parse_file(&fs::read_to_string(out_dir.join(path)).unwrap()).unwrap();
+                let field_counts = nested_record_fields(&f).into_iter().map(|(name, count)| {
+                    quote! { field_count!(#module_name::#name, #count); }
+                });
                 for i in f.items {
                     match i {
                         syn::Item::ForeignMod(i) => {
@@ -1177,6 +1180,7 @@ pub(crate) fn generate() {
                 modules.push(quote! {
                     mod #module_name;
                     #(pub use self::#module_name::#uses;)*
+                    #(#field_counts)*
                 });
             }
             // e.g., clang -E -dM -x c /dev/null -target aarch64-unknown-linux-gnu | grep -F __CHAR_
@@ -1269,6 +1273,44 @@ pub(crate) fn generate() {
             #(#target_modules)*
         },
     );
+}
+
+// Rust cannot destructure a union exhaustively. Record the number of fields
+// directly from bindgen, for types that appear as nested records.
+fn nested_record_fields(file: &syn::File) -> BTreeMap<syn::Ident, usize> {
+    let mut aliases = BTreeMap::new();
+    let mut records = BTreeMap::new();
+    for item in &file.items {
+        match item {
+            syn::Item::Struct(syn::ItemStruct {
+                ident,
+                fields: syn::Fields::Named(fields),
+                ..
+            })
+            | syn::Item::Union(syn::ItemUnion { ident, fields, .. }) => {
+                records.insert(ident, &fields.named);
+            }
+            syn::Item::Type(ty) => {
+                aliases.insert(&ty.ident, ty.ty.as_ref());
+            }
+            _ => {}
+        }
+    }
+    let mut counts = BTreeMap::new();
+    for fields in records.values() {
+        for field in *fields {
+            let mut ty = &field.ty;
+            while let syn::Type::Path(path) = ty {
+                let Some(name) = path.path.get_ident() else { break };
+                if let Some(fields) = records.get(name) {
+                    counts.insert(name.clone(), fields.len());
+                }
+                let Some(alias) = aliases.get(name) else { break };
+                ty = alias;
+            }
+        }
+    }
+    counts
 }
 
 fn download_headers(target: &TargetSpec, download_dir: &Utf8Path) -> Utf8PathBuf {

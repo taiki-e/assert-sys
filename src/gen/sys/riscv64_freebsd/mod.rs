@@ -246,6 +246,7 @@ pub use self::sys_umtx::_umtx_time;
 pub use self::sys_umtx::umtx_robust_lists_params;
 pub use self::sys_umtx::_umtx_op;
 pub use self::sys_umtx::_umtx_op_err;
+field_count!(sys_umtx::timespec, 2usize);
 mod machine_elf;
 pub use self::machine_elf::HWCAP_ISA_I;
 pub use self::machine_elf::HWCAP_ISA_M;

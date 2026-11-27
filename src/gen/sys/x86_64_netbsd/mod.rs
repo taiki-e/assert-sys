@@ -545,6 +545,32 @@ pub use self::sys_sysctl::CTL_PROC_PAXFLAGS_GUARD;
 pub use self::sys_sysctl::sysctl;
 pub use self::sys_sysctl::sysctlbyname;
 pub use self::sys_sysctl::sysctlnode;
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1, 6usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_1, 3usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1, 2usize);
+field_count!(
+    sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1__bindgen_ty_1,
+    1usize
+);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_2, 2usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1, 2usize);
+field_count!(
+    sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_1__bindgen_ty_1,
+    1usize
+);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_2, 2usize);
+field_count!(
+    sys_sysctl::sysctlnode__bindgen_ty_1__bindgen_ty_2__bindgen_ty_2__bindgen_ty_1,
+    1usize
+);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_2, 2usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_2__bindgen_ty_1, 1usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_3, 2usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_3__bindgen_ty_1, 1usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_4, 2usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_4__bindgen_ty_1, 1usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_5, 2usize);
+field_count!(sys_sysctl::sysctlnode__bindgen_ty_5__bindgen_ty_1, 1usize);
 mod sys_futex;
 pub use self::sys_futex::FUTEX_WAIT;
 pub use self::sys_futex::FUTEX_WAKE;
