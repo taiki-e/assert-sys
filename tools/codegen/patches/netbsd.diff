@@ -11,3 +11,50 @@ index cc9278867..3e8fce615 100644
 
  /*
   * CTL_MACHDEP definitions.
+diff --git a/sys/sys/futex.h b/sys/sys/futex.h
+index 78331810..bc992ec2 100644
+--- a/sys/sys/futex.h
++++ b/sys/sys/futex.h
+@@ -87,14 +87,15 @@
+ #define FUTEX_CMP_REQUEUE_PI		 12
+
+-#define FUTEX_PRIVATE_FLAG		__BIT(7)
+-#define FUTEX_CLOCK_REALTIME		__BIT(8)
++#define BINDGEN_CONST(name, expr) static const __typeof__(expr) name = (expr)
++BINDGEN_CONST(FUTEX_PRIVATE_FLAG, __BIT(7));
++BINDGEN_CONST(FUTEX_CLOCK_REALTIME, __BIT(8));
+
+-#define FUTEX_CMD_MASK			\
+-    (~(FUTEX_PRIVATE_FLAG|FUTEX_CLOCK_REALTIME))
++BINDGEN_CONST(FUTEX_CMD_MASK, ~(FUTEX_PRIVATE_FLAG|FUTEX_CLOCK_REALTIME));
+
+-#define FUTEX_OP_OP_MASK		__BITS(28,31)
+-#define FUTEX_OP_CMP_MASK		__BITS(24,27)
+-#define FUTEX_OP_OPARG_MASK		__BITS(12,23)
+-#define FUTEX_OP_CMPARG_MASK		__BITS(0,11)
++BINDGEN_CONST(FUTEX_OP_OP_MASK, __BITS(28,31));
++BINDGEN_CONST(FUTEX_OP_CMP_MASK, __BITS(24,27));
++BINDGEN_CONST(FUTEX_OP_OPARG_MASK, __BITS(12,23));
++BINDGEN_CONST(FUTEX_OP_CMPARG_MASK, __BITS(0,11));
+
+ #define FUTEX_OP(op, oparg, cmp, cmparg)		 \
+@@ -125,11 +126,12 @@
+  * 268,435,455 threads (as opposed to 1,073,741,823).
+  */
+-#define FUTEX_WAITERS		((int)__BIT(31))
+-#define FUTEX_OWNER_DIED	((int)__BIT(30))
+-#define FUTEX_SYNCOBJ_1		((int)__BIT(29))
+-#define FUTEX_SYNCOBJ_0		((int)__BIT(28))
+-#define FUTEX_TID_MASK		((int)__BITS(0,27))
+-
+-#define FUTEX_BITSET_MATCH_ANY  ((int)__BITS(0,31))
++BINDGEN_CONST(FUTEX_WAITERS, (int)__BIT(31));
++BINDGEN_CONST(FUTEX_OWNER_DIED, (int)__BIT(30));
++BINDGEN_CONST(FUTEX_SYNCOBJ_1, (int)__BIT(29));
++BINDGEN_CONST(FUTEX_SYNCOBJ_0, (int)__BIT(28));
++BINDGEN_CONST(FUTEX_TID_MASK, (int)__BITS(0,27));
++
++BINDGEN_CONST(FUTEX_BITSET_MATCH_ANY, (int)__BITS(0,31));
++#undef BINDGEN_CONST
+
+ /*
