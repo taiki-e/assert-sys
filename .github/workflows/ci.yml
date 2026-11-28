@@ -18,12 +18,12 @@ concurrency:
 
 jobs:
   tidy:
-    uses: taiki-e/github-actions/.github/workflows/tidy.yml@64535e607ea2bc43571fe978adaf5dbe191a1926 # 2026.11.26
+    uses: taiki-e/github-actions/.github/workflows/tidy.yml@819c2973bb5158701c304d7d85cb8e89ff418fc6 # 2026.11.28
     permissions:
       security-events: write # for github/codeql-action/*
   codegen:
     needs: tidy
-    uses: taiki-e/github-actions/.github/workflows/gen.yml@64535e607ea2bc43571fe978adaf5dbe191a1926 # 2026.11.26
+    uses: taiki-e/github-actions/.github/workflows/gen.yml@819c2973bb5158701c304d7d85cb8e89ff418fc6 # 2026.11.28
     permissions:
       contents: write # for creating branch for pr
       pull-requests: read # for gh pr list
@@ -33,7 +33,7 @@ jobs:
       free-device-space: true
   test:
     needs: tidy
-    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@64535e607ea2bc43571fe978adaf5dbe191a1926 # 2026.11.26
+    uses: taiki-e/github-actions/.github/workflows/rust-test.yml@819c2973bb5158701c304d7d85cb8e89ff418fc6 # 2026.11.28
     permissions:
       security-events: write # for github/codeql-action/*
     with:
