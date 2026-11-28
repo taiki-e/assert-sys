@@ -14,6 +14,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 - Suppress `clippy::float_arithmetic` lint in generated code.
 
+- Remove dependency on `rustversion`.
+
 ## [0.1.0] - 2026-11-27
 
 Initial release

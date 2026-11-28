@@ -24,9 +24,6 @@ allowed_external_types = [
 [lib]
 doc-scrape-examples = false
 
-[dependencies]
-rustversion = "1"
-
 [lints]
 workspace = true
 

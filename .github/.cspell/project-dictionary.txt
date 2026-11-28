@@ -37,6 +37,7 @@ prettyplease
 quic
 richlowe
 rseq
+rustversion
 solarish
 stdbool
 stddef

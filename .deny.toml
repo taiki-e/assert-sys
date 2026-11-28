@@ -19,7 +19,6 @@ build.include-dependencies = true
 build.include-workspace = false # covered by tools/tidy.sh
 build.include-archives = true
 build.allow-build-scripts = [
-    { name = "rustversion" },
 ]
 build.bypass = [
 ]
