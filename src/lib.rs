@@ -228,6 +228,7 @@ macro_rules! __static_assert_sys_const_cmp {
                 $crate::__private::Scalar(sys::$name).value(),
             );
             // Comparison code is inlined because float comparison in const fn require Rust 1.82.
+            #[allow(clippy::float_arithmetic)]
             {
                 use $crate::__private::{Value, f64, u128, usize};
                 match values {
