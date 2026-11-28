@@ -12,6 +12,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-28
+
 - Suppress `clippy::float_arithmetic` lint in generated code.
 
 - Remove dependency on `rustversion`.
@@ -20,5 +22,6 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/assert-sys/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/taiki-e/assert-sys/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/taiki-e/assert-sys/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/taiki-e/assert-sys/releases/tag/v0.1.0
